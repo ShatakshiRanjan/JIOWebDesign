@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel ="stylesheet" href="style.css">
+    <link rel ="stylesheet" href="../Static/style.css">
 </head>
 <body>
     <header>
@@ -14,23 +14,26 @@
                     Taskify!
                 </h1>
             </div>
-            <ul>
-                <li id ="Home">
-                    <a href="index.html">Home</a>
-                </li>
-                <li id ="Login">
-                    <a href="login.html">Login</a>
-                </li>
-                <li id ="Register" class="current">
-                    <a href="register.html">Register</a>
-                </li>
-            </ul>
+            <nav>
+                <ul>
+                    <li id ="Home">
+                        <a href="index.html">Home</a>
+                    </li>
+                    <li id ="Login">
+                        <a href="login.html">Login</a>
+                    </li>
+                    <li id ="Register" class="current">
+                        <a href="register.html">Register</a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </header>
     <div>
         <form>
             <input type="text" name="username" id="username" placeholder="Username" required>
             <input type="password" name="password" id="password" placeholder="Password" required>
+            <input type="password" name="password2" id="password2" placeholder="Confirm Password" required>
             <button type="submit">Login</button>
         </form>
     </div>
