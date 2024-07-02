@@ -1,3 +1,21 @@
+body{
+    font: 15px/1.5 Arial, Helvetica, sans-serif;
+    padding:0;
+    margin:0;
+    background-color: #f4f4f4;
+}
+
+.container{
+    width: 80%;
+    margin:auto;
+    overflow:hidden;
+}
+
+ul{
+    margin:0;
+    padding:0;
+}
+
 header{
     background:#35424a;
     color:#ffffff;
@@ -6,10 +24,6 @@ header{
     border-bottom:#e8491d 3px solid;
 }
 
-header .current{
-    color:darkgoldenrod;
-    font-weight: bold;
-}
 
 header a{
     color:#ffffff;
@@ -18,9 +32,32 @@ header a{
     font-size: 16px;
 }
 
-
 header li{
     float:left;
     display:inline;
     padding:0 20px 0 20px;
+}
+
+header #brand{
+    float:left;
+}
+
+header #brand h1{
+    margin:0;
+}
+
+
+header nav{
+    float:right;
+    margin-top: 10px;
+}
+
+header .current a{
+    color:darkgoldenrod;
+    font-weight: bold;
+}
+
+header a:hover{
+    color:#cccccc;
+    font-weight:bold;
 }
