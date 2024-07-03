@@ -23,10 +23,12 @@ def get_db():
     return db
 
 def init_db():
+    print("Initializing the database...")
     with app.app_context():
         db = get_db()
-        with app.open_resource('schema.sql') as f:
+        with app.open_resource('Schema.sql') as f:
             db.executescript(f.read().decode('utf-8'))
+        print("Database initialized successfully.")
 
 @app.teardown_appcontext
 def close_connection(exception):
@@ -91,5 +93,8 @@ def home():
 
 if __name__ == '__main__':
     if not os.path.exists(DATABASE):
+        print("Database file not found. Initializing the database...")
         init_db()
+    else:
+        print("Database file found.")
     app.run(host='0.0.0.0', port=8000, debug=True)

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taskify! | Welcome</title>
+    <link rel ="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div id="brand">
+                <h1>
+                    Taskify!
+                </h1>
+            </div>
+            <nav>
+                <ul>
+                    <li id="Home" class="current">
+                        <a href="{{ url_for('home') }}">Home</a>
+                    </li>
+                    <li id="Login">
+                        <a href="{{ url_for('login') }}">Login</a>
+                    </li>
+                    <li id="Register">
+                        <a href="{{ url_for('register') }}">Register</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <div>
+        <h2>
+            Welcome to Taskify!
+        </h2>
+        <p>
+            Taskify is a simple task management tool that helps you keep track of your tasks and manage them efficiently.
+        </p>
+        <p>
+            To get started, please <a href="login.html">login</a> or <a href="register.html">register</a>.
+        </p>
+    </div>
+</body>
+</html>
