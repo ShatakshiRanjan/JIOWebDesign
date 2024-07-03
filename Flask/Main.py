@@ -1,40 +1,21 @@
-from flask import Flask, g, render_template, request, redirect, url_for, session
-import sqlite3
-from os import urandom
-from dotenv import load_dotenv
-import os
+from flask import Flask, render_template, request, redirect, url_for, session
+from flask_mysqldb import MySQL
+import MySQLdb.cursors
+import re
 
-# Initialize Flask app
 app = Flask(__name__)
-app.secret_key = urandom(24)
-app.config["SESSION_PERMANENT"] = False
-app.config["SESSION_TYPE"] = "filesystem"
-load_dotenv()
 
-# Database configuration
-DATABASE = 'profiles.db'
-app.config['DATABASE'] = DATABASE
+# Change this to your secret key (it can be anything, it's for extra protection)
+app.secret_key = 'your secret key'
 
-# Helper function to get the database connection
-def get_db():
-    db = getattr(g, '_database', None)
-    if db is None:
-        db = g._database = sqlite3.connect(DATABASE)
-    return db
+# Enter your database connection details below
+app.config['MYSQL_HOST'] = '127.0.0.1'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = 't9dGn6iug*5hdj_'
+app.config['MYSQL_DB'] = 'Taskify'
 
-def init_db():
-    print("Initializing the database...")
-    with app.app_context():
-        db = get_db()
-        with app.open_resource('Schema.sql') as f:
-            db.executescript(f.read().decode('utf-8'))
-        print("Database initialized successfully.")
-
-@app.teardown_appcontext
-def close_connection(exception):
-    db = getattr(g, '_database', None)
-    if db is not None:
-        db.close()
+# Intialize MySQL
+mysql = MySQL(app)
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -45,18 +26,20 @@ def register():
         last_name = request.form.get("last_name")
         password = request.form.get("password")
         password2 = request.form.get("password2")
-        
+
         # Check if passwords match
         if password != password2:
             return render_template("register.html", error="Passwords do not match")
 
-        db = get_db()
-        cursor = db.cursor()
+        # Hash the password for security
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
 
+        cursor = mysql.connection.cursor()
         # Insert new user into the database
-        cursor.execute("INSERT INTO users (email, first_name, last_name, passw) VALUES (?, ?, ?, ?)", 
-                       (email, first_name, last_name, password))
-        db.commit()
+        cursor.execute("INSERT INTO users (email, first_name, last_name, passw) VALUES (%s, %s, %s, %s)",
+                       (email, first_name, last_name, hashed_password))
+        mysql.connection.commit()
+        cursor.close()
 
         return redirect(url_for("login"))
     return render_template("register.html")
@@ -67,20 +50,22 @@ def login():
         email = request.form.get("email")
         password = request.form.get("password")
         
-        db = get_db()
-        cursor = db.cursor()
-
+        # Hash the password for security
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
+        
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         # Retrieve the user's record from the database based on email
-        cursor.execute("SELECT * FROM users WHERE email = ?", (email,))
+        cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
         user = cursor.fetchone()
+        cursor.close()
 
         if not user:
             return render_template("error.html", error="User not found")
 
         # Compare the provided password with the password stored in the database
-        if user[4] == password:  # Assuming both are plain text
+        if user['passw'] == hashed_password:
             # Store user information in the session
-            session["user_id"] = user[0]
+            session["user_id"] = user['id']
             return redirect(url_for("nextpage"))
         else:
             return render_template("error.html", error="Incorrect password")
@@ -96,9 +81,5 @@ def nextpage():
     return render_template('nextlogin.html')
 
 if __name__ == '__main__':
-    if not os.path.exists(DATABASE):
-        print("Database file not found. Initializing the database...")
-        init_db()
-    else:
-        print("Database file found.")
     app.run(host='0.0.0.0', port=8000, debug=True)
+
