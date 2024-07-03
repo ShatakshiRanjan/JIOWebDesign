@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Taskify! | Register</title>
     <link rel ="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -16,13 +16,13 @@
             </div>
             <nav>
                 <ul>
-                    <li id="Home" class="current">
+                    <li id="Home">
                         <a href="{{ url_for('home') }}">Home</a>
                     </li>
                     <li id="Login">
                         <a href="{{ url_for('login') }}">Login</a>
                     </li>
-                    <li id="Register">
+                    <li id="Register" class="current">
                         <a href="{{ url_for('register') }}">Register</a>
                     </li>
                 </ul>
@@ -30,11 +30,16 @@
         </div>
     </header>
     <div>
-        <form>
-            <input type="text" name="username" id="username" placeholder="Username" required>
+        <form method="POST">
+            <input type="email" name="email" id="email" placeholder="Email" required>
+            <input type="text" name="first_name" id="first_name" placeholder="First Name" required>
+            <input type="text" name="last_name" id="last_name" placeholder="Last Name" required>
             <input type="password" name="password" id="password" placeholder="Password" required>
             <input type="password" name="password2" id="password2" placeholder="Confirm Password" required>
-            <button type="submit">Login</button>
+            <button type="submit">Register</button>
+            {% if error %}
+            <p style="color:red;">{{ error }}</p>
+            {% endif %}
         </form>
     </div>
 </body>
