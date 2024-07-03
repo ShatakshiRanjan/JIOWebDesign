@@ -1,6 +1,10 @@
+-- Database 
+CREATE DATABASE  IF NOT EXISTS `Taskify`
+USE `Taskify`;
+
 -- Drop tables if they exist (optional)
-#DROP TABLE IF EXISTS users;
-#DROP TABLE IF EXISTS tasks;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS tasks;
 
 -- Create users table
 CREATE TABLE users (
