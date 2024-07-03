@@ -79,7 +79,7 @@ def login():
         if user[4] == password:  # Assuming both are plain text
             # Store user information in the session
             session["user_id"] = user[0]
-            return redirect(url_for("home"))
+            return redirect(url_for("nextpage"))
         else:
             return render_template("error.html", error="Incorrect password")
 
@@ -88,6 +88,10 @@ def login():
 @app.route('/')
 def home():
     return render_template('index.html')
+
+@app.route('/nextpage')
+def nextpage():
+    return render_template('nextlogin.html')
 
 if __name__ == '__main__':
     if not os.path.exists(DATABASE):
