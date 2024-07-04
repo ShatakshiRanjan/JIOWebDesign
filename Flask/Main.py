@@ -61,7 +61,7 @@ def login():
         cursor.close()
 
         if not user:
-            return render_template("error.html", error="User not found")
+            return render_template("login.html", error="Incorrect username or password")
 
         # Compare the provided password with the password stored in the database
         if user['passw'] == hashed_password:
@@ -69,7 +69,7 @@ def login():
             session["user_id"] = user['id']
             return redirect(url_for("nextpage"))
         else:
-            return render_template("error.html", error="Incorrect password")
+            return render_template("login.html", error="Incorrect username or password")
 
     return render_template("login.html")
 
