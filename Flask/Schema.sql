@@ -1,17 +1,26 @@
-DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS tasks;
+-- Database 
+#CREATE DATABASE  IF NOT EXISTS `Taskify`
+#USE `Taskify`;
 
-CREATE TABLE users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    email TEXT NOT NULL,
-    first_name TEXT NOT NULL,
-    last_name TEXT NOT NULL,
-    passw TEXT NOT NULL
-);
+-- Drop tables if they exist (optional)
+#DROP TABLE IF EXISTS users;
+#DROP TABLE IF EXISTS tasks;
 
-CREATE TABLE tasks (
-    TID INTEGER PRIMARY KEY AUTOINCREMENT,
-    task TEXT NOT NULL,
-    dateOfTaskStart TEXT NOT NULL,
-    dateOfTaskEnd TEXT NOT NULL
-);
+-- Create users table
+#CREATE TABLE users (
+#    id INT AUTO_INCREMENT PRIMARY KEY,
+#    email VARCHAR(255) NOT NULL,
+#    first_name VARCHAR(100) NOT NULL,
+#    last_name VARCHAR(100) NOT NULL,
+#    passw VARCHAR(255) NOT NULL
+#);
+
+-- Create tasks table
+#CREATE TABLE tasks (
+#    TID INT AUTO_INCREMENT PRIMARY KEY,
+#    task TEXT NOT NULL,
+#    dateOfTaskStart DATETIME NOT NULL,
+#    dateOfTaskEnd DATETIME NOT NULL
+#);
+
+select email, passw from users;
