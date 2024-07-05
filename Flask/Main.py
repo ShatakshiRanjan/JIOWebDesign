@@ -19,9 +19,9 @@ app.config['MYSQL_DB'] = 'Taskify'
 # Intialize MySQL
 mysql = MySQL(app)
 
-def favicon():
-    return send_from_directory(os.path.join(app.root_path, 'static', 'Images'),
-                               'favicon.ico')
+# def favicon():
+#     return send_from_directory(os.path.join(app.root_path, 'static', 'Images'),
+#                                'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -96,7 +96,28 @@ def nextpage():
 
 @app.route('/task')
 def task():
-    return render_template('htmltask.html')
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute("SELECT id, first_name, last_name FROM users")
+    users = cursor.fetchall()
+    cursor.close()
+    return render_template('htmltask.html', users=users)
+
+@app.route('/submit_task', methods=['POST'])
+def submit_task():
+    task = request.form['task']
+    dateOfTaskStart = request.form['dateOfTaskStart']
+    dateOfTaskEnd = request.form['dateOfTaskEnd']
+    dedicatedTo = request.form['dedicatedTo']
+    descript = request.form['descript']
+    
+    cursor = mysql.connection.cursor()
+    sql = "INSERT INTO tasks (task, dateOfTaskStart, dateOfTaskEnd, dedicatedTo, descript) VALUES (%s, %s, %s, %s, %s)"
+    val = (task, dateOfTaskStart, dateOfTaskEnd, dedicatedTo, descript)
+    cursor.execute(sql, val)
+    mysql.connection.commit()
+    cursor.close()
+    
+    return redirect('/task')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)

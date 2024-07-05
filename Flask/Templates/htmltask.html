@@ -1,39 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Task Form</title>
 </head>
 <body>
     <h1>Task Form</h1>
-    <form>
-        <!-- Task -->
+    <form method="POST" action="/submit_task">
         <label for="task">Task:</label>
         <input type="text" id="task" name="task"><br><br>
 
-        <!-- Start Date -->
-        <label for="start-date">Start Date:</label>
-        <input type="date" id="start-date" name="start-date"><br><br>
+        <label for="dateOfTaskStart">Start Date:</label>
+        <input type="date" id="dateOfTaskStart" name="dateOfTaskStart"><br><br>
 
-        <!-- End Date -->
-        <label for="end-date">End Date:</label>
-        <input type="date" id="end-date" name="end-date"><br><br>
+        <label for="dateOfTaskEnd">End Date:</label>
+        <input type="date" id="dateOfTaskEnd" name="dateOfTaskEnd"><br><br>
 
-        <!-- Dedicated To -->
-        <label for="dedicated-to">Dedicated To:</label>
-        <select id="dedicated-to" name="dedicated-to">
-            <option value="person1">Person 1</option>
-            <option value="person2">Person 2</option>
-            <option value="team">Team</option>
-            <option value="department">Department</option>
+        <label for="dedicatedTo">Dedicated To:</label>
+        <select id="dedicatedTo" name="dedicatedTo">
+            {% for user in users %}
+                <option value="{{ user.id }}">{{ user.first_name }} {{ user.last_name }}</option>
+            {% endfor %}
         </select><br><br>
 
-        <!-- Description -->
-        <label for="description">Description:</label><br>
-        <textarea id="description" name="description" rows="4" cols="50"></textarea><br><br>
+        <label for="descript">Description:</label>
+        <textarea id="descript" name="descript"></textarea><br><br>
 
-        <!-- Submit Button -->
         <input type="submit" value="Submit">
     </form>
 </body>
