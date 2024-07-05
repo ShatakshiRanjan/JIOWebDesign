@@ -79,7 +79,19 @@ def home():
 
 @app.route('/nextpage')
 def nextpage():
-    return render_template('nextlogin.html')
+    user_id = session.get("user_id")
+    if user_id:
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute("SELECT first_name FROM users WHERE id = %s", (user_id,))
+        user = cursor.fetchone()
+        cursor.close()
+        if user:
+            return render_template('dashboard.html', first_name=user['first_name'])
+    return redirect(url_for('login'))
+
+@app.route('/task')
+def task():
+    return render_template('htmltask.html')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)

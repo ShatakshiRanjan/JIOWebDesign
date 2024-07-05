@@ -45,6 +45,7 @@
 </head>
 <body>
     <div class="dashboard-container">
+        <h1>Hello, {{ first_name }}</h1>
         <div class="section">
             <h3>Activities</h3>
             <ul>
@@ -69,6 +70,9 @@
                 <li>Task 3</li>
             </ul>
         </div>
+        <p id="Home" class="current">
+            <a href="{{ url_for('task') }}">Task</a>
+        </p>
     </div>
 </body>
 </html>
