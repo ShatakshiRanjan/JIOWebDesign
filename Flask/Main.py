@@ -1,8 +1,9 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory
 from flask_mysqldb import MySQL
 import MySQLdb.cursors
 import re
 import hashlib 
+import os
 
 app = Flask(__name__)
 
@@ -17,6 +18,10 @@ app.config['MYSQL_DB'] = 'Taskify'
 
 # Intialize MySQL
 mysql = MySQL(app)
+
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static', 'Images'),
+                               'favicon.ico')
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
