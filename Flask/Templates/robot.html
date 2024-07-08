@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Google Recaptcha, How to use the “I'm not a Robot”</title>
+  <style>
+    .fb9 {
+      border: 1px solid #3366FF;
+      background-color: #B3C6FF;
+      width:150px;
+      height:30px;
+    }
+  </style>
+  <script src='https://www.google.com/recaptcha/api.js'></script>
+</head>
+
+<body>
+  <form action="" method="post">
+    <h1>Google Recaptcha, How to use the “I'm not a Robot”</h1>
+    <div>
+      <label for="name">Name:</label>
+      <input name="name" required>
+    </div>
+    <div>
+      <label for="email">Email:</label>
+      <input name="email" type="email" required><br/>
+    </div>
+    <div>
+      <label for="phone">Phone:</label>
+      <input name="phone" type="phone" required><br/>
+    </div>
+    <div class="g-recaptcha" data-sitekey="6Ldbdg0TAAAAAI7KAf72Q6uagbWzWecTeBWmrCpJ"></div>
+    <input type="submit" value="Submit" class="fb9" />
+
+  </form>
+
+</body>
+
+</html>
