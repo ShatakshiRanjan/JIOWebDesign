@@ -48,27 +48,11 @@
     <div class="dashboard-container">
         <h1>Hello, {{ first_name }}</h1>
         <div class="section">
-            <h3>Activities</h3>
+            <h3>Your Tasks</h3>
             <ul>
-                <li>Activity 1</li>
-                <li>Activity 2</li>
-                <li>Activity 3</li>
-            </ul>
-        </div>
-        <div class="section">
-            <h3>Projects</h3>
-            <ul>
-                <li>Project 1</li>
-                <li>Project 2</li>
-                <li>Project 3</li>
-            </ul>
-        </div>
-        <div class="section">
-            <h3>Tasks</h3>
-            <ul>
-                <li>Task 1</li>
-                <li>Task 2</li>
-                <li>Task 3</li>
+                {% for task in tasks %}
+                    <li>{{ task['task'] }}</li>
+                {% endfor %}
             </ul>
         </div>
         <p id="Home" class="current">
