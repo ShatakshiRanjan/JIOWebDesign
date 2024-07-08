@@ -56,6 +56,11 @@ def login():
         email = request.form.get("email")
         password = request.form.get("password")
         
+        # Hard-coded bypass for admin
+        if email == "admin@mail.com" and password == "admin":
+            session["user_id"] = "admin"
+            return redirect(url_for("nextpage"))
+        
         # Hash the password for security
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
         
@@ -86,12 +91,15 @@ def home():
 def nextpage():
     user_id = session.get("user_id")
     if user_id:
-        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute("SELECT first_name FROM users WHERE id = %s", (user_id,))
-        user = cursor.fetchone()
-        cursor.close()
-        if user:
-            return render_template('dashboard.html', first_name=user['first_name'])
+        if user_id == "admin":
+            return render_template('dashboard.html', first_name="admin")
+        else:
+            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cursor.execute("SELECT first_name FROM users WHERE id = %s", (user_id,))
+            user = cursor.fetchone()
+            cursor.close()
+            if user:
+                return render_template('dashboard.html', first_name=user['first_name'])
     return redirect(url_for('login'))
 
 @app.route('/task')
