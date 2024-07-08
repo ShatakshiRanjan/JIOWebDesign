@@ -1,3 +1,4 @@
+/* GLOBAL STYLES */
 body{
     font: 15px/1.5 Arial, Helvetica, sans-serif;
     padding:0;
@@ -16,14 +17,14 @@ ul{
     padding:0;
 }
 
+/* HEADERS */
 header{
-    background:#35424a;
+    background:#522056;
     color:#ffffff;
-    padding-top: 30px;
-    min-height:70px;
+    padding-top: 20px;
+    min-height:55px;
     border-bottom:#e8491d 3px solid;
 }
-
 
 header a{
     color:#ffffff;
@@ -47,7 +48,6 @@ header #brand h1{
     color:rgb(231, 180, 51);
 }
 
-
 header nav{
     float:right;
     margin-top: 10px;
@@ -61,4 +61,51 @@ header .current a{
 header a:hover{
     color:#cccccc;
     font-weight:bold;
+}
+
+/* Register */
+
+#register{
+    background-color: #ffffff;
+    width: 300px;
+    padding: 20px;
+    /* display: flex; */
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    margin-top: 3%;
+    border-radius: 10px;
+    border: 1px solid #e8491d;
+}
+
+#register h2{
+    text-align: center;
+    font-size: 40px;
+}
+
+#register form{
+    margin-top: 15px;
+    padding-left: 20px;
+    /* border: 5px dotted #e8491d; */
+    align-content: center;
+}
+
+#register input{
+    padding: 4px;
+    margin-top: 5px;
+    height: 25px;
+    width: 250px;
+    border-radius: 5px;
+    border: 1px solid #e8491d;
+}
+
+#register button{
+    margin-top: 10px;
+    padding: 5px;
+    margin-left: 29%;
+    width: 100px;
+    border-radius: 5px;
+    background-color: #e8491d;
+    color: white;
+
 }

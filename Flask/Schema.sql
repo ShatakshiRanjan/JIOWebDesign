@@ -19,8 +19,12 @@ CREATE TABLE users (
 #CREATE TABLE tasks (
 #    TID INT AUTO_INCREMENT PRIMARY KEY,
 #    task TEXT NOT NULL,
-#    dateOfTaskStart DATETIME NOT NULL,
-#    dateOfTaskEnd DATETIME NOT NULL
+#    dateOfTaskStart DATE NOT NULL,
+#    dateOfTaskEnd DATE NOT NULL,
+#    dedicatedTo INT NOT NULL,
+#    descript TEXT NOT NULL,
+#    FOREIGN KEY (dedicatedTo) REFERENCES users(id)
 #);
 
-select email, passw from users;
+select * from tasks;
+

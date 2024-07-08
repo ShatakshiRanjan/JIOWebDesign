@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Taskify! | Register</title>
     <link rel ="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='Images/favicon.ico') }}">
 </head>
 <body>
     <header>
@@ -29,13 +30,16 @@
             </nav>
         </div>
     </header>
-    <div>
+    <div id="register">
+        <h2>
+            Register
+        </h2>
         <form method="POST">
-            <input type="email" name="email" id="email" placeholder="Email" required>
-            <input type="text" name="first_name" id="first_name" placeholder="First Name" required>
-            <input type="text" name="last_name" id="last_name" placeholder="Last Name" required>
-            <input type="password" name="password" id="password" placeholder="Password" required>
-            <input type="password" name="password2" id="password2" placeholder="Confirm Password" required>
+            <input type="email" name="email" id="email" placeholder="Email" required><br>
+            <input type="text" name="first_name" id="first_name" placeholder="First Name" required><br>
+            <input type="text" name="last_name" id="last_name" placeholder="Last Name" required><br>
+            <input type="password" name="password" id="password" placeholder="Password" required><br>
+            <input type="password" name="password2" id="password2" placeholder="Confirm Password" required><br><br>
             <button type="submit">Register</button>
             {% if error %}
             <p style="color:red;">{{ error }}</p>
