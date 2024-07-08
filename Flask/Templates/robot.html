@@ -84,10 +84,44 @@
 <script type="text/javascript">
     var onloadCallback = function() {
         grecaptcha.render('google-recaptcha-checkbox', {
-            'sitekey' : 'my-ste-key-goes-here'
+            'sitekey' : '6LeuxwoqAAAAALbj5_JMHbp9OTdzad6Eqn1O1fes'
         });
     };
 </script>
 
 </body>
 </html>
+
+<!-- <?php
+
+if (array_key_exists('signUpAttempt', $_POST)) {
+
+	$captcha = isset($_POST['g-recaptcha-response']) ? $_POST['g-recaptcha-response'] : null;
+
+	// ultimately these could be constants in a "secrets" file
+	// 	aka stored as environment variables
+	#$captchaPublic = constant('CAPTCHA_PUBLIC');
+	#$captchaSecret = constant('CAPTCHA_SECRET');
+	$captchaPublic = "my-public-key-here";
+	$captchaSecret = "my-secret-key-here";
+
+	$res = json_decode(file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=".$captchaSecret ."&response=".$captcha));
+
+	if($res->success === true){
+		// ok! don't do anything
+	} else{
+		print "Error: Human check failed";
+		exit();
+	}
+	
+	// continue sign up process as normal
+	print "You don't seem to be a robot";
+	exit();
+
+	#$email = $_POST['email'] ?? '';
+	#$password = $_POST['password'] ?? '';
+
+	// ...
+
+}
+?> -->

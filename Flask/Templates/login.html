@@ -37,11 +37,25 @@
         <form method="POST">
             <input type="email" name="email" id="email" placeholder="Email" required>
             <input type="password" name="password" id="password" placeholder="Password" required>
+            <div id="google-recaptcha-checkbox"></div>
+
+        <input type="hidden" name="signUpAttempt" value="1">
             <button type="submit">Login</button>
             {% if error %}
             <p style="color:red;">{{ error }}</p>
             {% endif %}
         </form>
     </div>
+    <script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit"
+    async defer>
+</script>
+
+<script type="text/javascript">
+    var onloadCallback = function() {
+        grecaptcha.render('google-recaptcha-checkbox', {
+            'sitekey' : '6LeuxwoqAAAAALbj5_JMHbp9OTdzad6Eqn1O1fes'
+        });
+    };
+</script>
 </body>
 </html>
