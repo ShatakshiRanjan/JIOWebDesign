@@ -4,7 +4,7 @@
 
 1. **Clone the repository or download the zip file:**
     ```sh
-    git clone [<repository-url>](https://github.com/ShatakshiRanjan/JIOWebDesign)
+    git clone https://github.com/ShatakshiRanjan/JIOWebDesign
     ```
 
 2. **Navigate to the "Flask" Directory:**
