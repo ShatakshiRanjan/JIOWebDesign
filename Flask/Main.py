@@ -1,9 +1,7 @@
-from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory
+from flask import Flask, render_template, request, redirect, url_for, session
 from flask_mysqldb import MySQL
 import MySQLdb.cursors
-import re
-import hashlib 
-import os
+import hashlib
 
 app = Flask(__name__)
 
@@ -16,7 +14,7 @@ app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 't9dGn6iug*5hdj_'
 app.config['MYSQL_DB'] = 'Taskify'
 
-# Intialize MySQL
+# Initialize MySQL
 mysql = MySQL(app)
 
 def favicon():
@@ -56,6 +54,11 @@ def login():
         email = request.form.get("email")
         password = request.form.get("password")
         
+        # Hard-coded bypass for admin
+        if email == "admin@mail.com" and password == "admin":
+            session["user_id"] = "admin"
+            return redirect(url_for("nextpage"))
+        
         # Hash the password for security
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
         
@@ -83,21 +86,60 @@ def home():
     Background = os.path.join(os.path.join("static", "Images"), "background_1.jpg")
     return render_template('index.html', user_image=Background)
 
-@app.route('/nextpage')
+@app.route('/dashboard')
 def nextpage():
     user_id = session.get("user_id")
     if user_id:
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute("SELECT first_name FROM users WHERE id = %s", (user_id,))
-        user = cursor.fetchone()
+        
+        # Fetch user first name
+        if user_id == "admin":
+            first_name = "admin"
+            tasks = []
+        else:
+            cursor.execute("SELECT first_name FROM users WHERE id = %s", (user_id,))
+            user = cursor.fetchone()
+            first_name = user['first_name'] if user else None
+
+            # Fetch tasks for the user using the dedicatedTo column
+            cursor.execute("SELECT task FROM tasks WHERE dedicatedTo = %s", (user_id,))
+            tasks = cursor.fetchall()
+        
         cursor.close()
-        if user:
-            return render_template('dashboard.html', first_name=user['first_name'])
+        
+        if first_name:
+            return render_template('dashboard.html', first_name=first_name, tasks=tasks)
+    
     return redirect(url_for('login'))
 
 @app.route('/task')
 def task():
-    return render_template('htmltask.html')
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute("SELECT id, first_name, last_name FROM users")
+    users = cursor.fetchall()
+    cursor.close()
+    return render_template('htmltask.html', users=users)
+
+@app.route('/submit_task', methods=['POST'])
+def submit_task():
+    user_id = session.get("user_id")
+    if not user_id:
+        return redirect(url_for('login'))
+
+    task = request.form['task']
+    dateOfTaskStart = request.form['dateOfTaskStart']
+    dateOfTaskEnd = request.form['dateOfTaskEnd']
+    dedicatedTo = request.form['dedicatedTo']
+    descript = request.form['descript']
+    
+    cursor = mysql.connection.cursor()
+    sql = "INSERT INTO tasks (user_id, task, dateOfTaskStart, dateOfTaskEnd, dedicatedTo, descript) VALUES (%s, %s, %s, %s, %s, %s)"
+    val = (user_id, task, dateOfTaskStart, dateOfTaskEnd, dedicatedTo, descript)
+    cursor.execute(sql, val)
+    mysql.connection.commit()
+    cursor.close()
+    
+    return redirect('/task')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)
