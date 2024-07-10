@@ -61,5 +61,4 @@
 
 ---
 
-This README provides detailed instructions on how to set up and run the Flask application for JIOWebDesign using markdown syntax. Adjust the placeholders (`<repository-url>` and `your_mysql_password`) with actual values as needed.
-
+This README provides detailed instructions on how to set up and run the Flask application for JIOWebDesign using markdown syntax.
