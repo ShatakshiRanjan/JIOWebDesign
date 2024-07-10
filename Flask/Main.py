@@ -81,7 +81,7 @@ def login():
 def home():
     return render_template('index.html')
 
-@app.route('/nextpage')
+@app.route('/dashboard')
 def nextpage():
     user_id = session.get("user_id")
     if user_id:
@@ -96,8 +96,8 @@ def nextpage():
             user = cursor.fetchone()
             first_name = user['first_name'] if user else None
 
-            # Fetch tasks for the user
-            cursor.execute("SELECT task FROM tasks WHERE user_id = %s", (user_id,))
+            # Fetch tasks for the user using the dedicatedTo column
+            cursor.execute("SELECT task FROM tasks WHERE dedicatedTo = %s", (user_id,))
             tasks = cursor.fetchall()
         
         cursor.close()
@@ -138,3 +138,4 @@ def submit_task():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)
+
