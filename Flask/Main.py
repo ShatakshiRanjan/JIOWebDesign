@@ -3,6 +3,7 @@ from flask_mysqldb import MySQL
 import MySQLdb.cursors
 import hashlib
 import os
+# Not required if inputting manually 
 import config
 
 app = Flask(__name__)
@@ -131,19 +132,26 @@ def submit_task():
         return redirect(url_for('login'))
 
     task = request.form['task']
-    dateOfTaskStart = request.form['dateOfTaskStart']
-    dateOfTaskEnd = request.form['dateOfTaskEnd']
+    dateOfTaskStart = request.form.get('dateOfTaskStart')
+    timeOfTaskStart = request.form.get('timeOfTaskStart')
+    dateOfTaskEnd = request.form.get('dateOfTaskEnd')
+    timeOfTaskEnd = request.form.get('timeOfTaskEnd')
     dedicatedTo = request.form['dedicatedTo']
     descript = request.form['descript']
     
     cursor = mysql.connection.cursor()
-    sql = "INSERT INTO tasks (user_id, task, dateOfTaskStart, dateOfTaskEnd, dedicatedTo, descript) VALUES (%s, %s, %s, %s, %s, %s)"
-    val = (user_id, task, dateOfTaskStart, dateOfTaskEnd, dedicatedTo, descript)
+    sql = """
+        INSERT INTO tasks (
+            user_id, task, dateOfTaskStart, timeOfTaskStart, dateOfTaskEnd, timeOfTaskEnd, dedicatedTo, descript
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+    """
+    val = (user_id, task, dateOfTaskStart, timeOfTaskStart, dateOfTaskEnd, timeOfTaskEnd, dedicatedTo, descript)
     cursor.execute(sql, val)
     mysql.connection.commit()
     cursor.close()
     
     return redirect('/task')
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)
