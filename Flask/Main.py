@@ -3,24 +3,27 @@ from flask_mysqldb import MySQL
 import MySQLdb.cursors
 import hashlib
 import os
+import config
 
 app = Flask(__name__)
 
 # Change this to your secret key (it can be anything, it's for extra protection)
 app.secret_key = 'your secret key'
 
-# Enter your database connection details below
-app.config['MYSQL_HOST'] = '127.0.0.1'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'root'
-app.config['MYSQL_DB'] = 'Taskify'
+# Enter your database connection details manually
+#app.config['MYSQL_HOST'] = '127.0.0.1'
+#app.config['MYSQL_USER'] = 'root'
+#app.config['MYSQL_PASSWORD'] = 'password'
+#app.config['MYSQL_DB'] = 'Taskify'
+
+# Else: for information stored in config.py
+app.config['MYSQL_HOST'] = config.MYSQL_HOST
+app.config['MYSQL_USER'] = config.MYSQL_USER
+app.config['MYSQL_PASSWORD'] = config.MYSQL_PASSWORD
+app.config['MYSQL_DB'] = config.MYSQL_DB
 
 # Initialize MySQL
 mysql = MySQL(app)
-
-def favicon():
-    return send_from_directory(os.path.join(app.root_path, 'static', 'Images'),
-                               'favicon.ico')
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -56,9 +59,9 @@ def login():
         password = request.form.get("password")
         
         # Hard-coded bypass for admin
-        if email == "admin@mail.com" and password == "admin":
-            session["user_id"] = "admin"
-            return redirect(url_for("nextpage"))
+        #if email == "admin@mail.com" and password == "admin":
+        #    session["user_id"] = "admin"
+        #    return redirect(url_for("nextpage"))
         
         # Hash the password for security
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
