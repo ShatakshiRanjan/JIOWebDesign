@@ -27,16 +27,28 @@
             margin-bottom: 8px;
             font-weight: bold;
         }
-        input[type="text"],
-        input[type="date"],
-        input[type="time"],
-        select,
-        textarea {
+        .form-group {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            width: 100%;
+            margin-bottom: 5px;
+        }
+        .form-group input[type="date"],
+        .form-group input[type="time"],
+        .form-group input[type="text"],
+        .form-group select,
+        .form-group textarea {
             width: 100%;
             padding: 10px;
-            margin-bottom: 20px;
             border: 1px solid #ccc;
             border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .form-group-half {
+            width: 48%;
         }
         input[type="submit"] {
             width: 100%;
@@ -56,33 +68,57 @@
 <body>
     <h1>Task Form</h1>
     <form method="POST" action="/submit_task">
-        <label for="task">Task:</label>
-        <input type="text" id="task" name="task"><br><br>
+        <div class="form-group">
+            <div class="form-group-full">
+                <label for="task">Task:</label>
+                <input type="text" id="task" name="task">
+            </div>
+        </div>
 
-        <label for="dateOfTaskStart">Start Date:</label>
-        <input type="date" id="dateOfTaskStart" name="dateOfTaskStart"><br><br>
+        <div class="form-group">
+            <div class="form-group-half">
+                <label for="dateOfTaskStart">Start Date:</label>
+                <input type="date" id="dateOfTaskStart" name="dateOfTaskStart">
+            </div>
+            <div class="form-group-half">
+                <label for="timeOfTaskStart">Start Time:</label>
+                <input type="time" id="timeOfTaskStart" name="timeOfTaskStart">
+            </div>
+        </div>
 
-        <label for="timeOfTaskStart">Start Time:</label>
-        <input type="time" id="timeOfTaskStart" name="timeOfTaskStart"><br><br>
+        <div class="form-group">
+            <div class="form-group-half">
+                <label for="dateOfTaskEnd">End Date:</label>
+                <input type="date" id="dateOfTaskEnd" name="dateOfTaskEnd">
+            </div>
+            <div class="form-group-half">
+                <label for="timeOfTaskEnd">End Time:</label>
+                <input type="time" id="timeOfTaskEnd" name="timeOfTaskEnd">
+            </div>
+        </div>
 
-        <label for="dateOfTaskEnd">End Date:</label>
-        <input type="date" id="dateOfTaskEnd" name="dateOfTaskEnd"><br><br>
+        <div class="form-group">
+            <div class="form-group-full">
+                <label for="dedicatedTo">Assigned To:</label>
+                <select id="dedicatedTo" name="dedicatedTo">
+                    {% for user in users %}
+                        <option value="{{ user.id }}">{{ user.first_name }} {{ user.last_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
 
-        <label for="timeOfTaskEnd">End Time:</label>
-        <input type="time" id="timeOfTaskEnd" name="timeOfTaskEnd"><br><br>
-
-        <label for="dedicatedTo">Assigned To:</label>
-        <select id="dedicatedTo" name="dedicatedTo">
-            {% for user in users %}
-                <option value="{{ user.id }}">{{ user.first_name }} {{ user.last_name }}</option>
-            {% endfor %}
-        </select><br><br>
-
-        <label for="descript">Description:</label>
-        <textarea id="descript" name="descript"></textarea><br><br>
+        <div class="form-group">
+            <div class="form-group-full">
+                <label for="descript">Description:</label>
+                <textarea id="descript" name="descript"></textarea>
+            </div>
+        </div>
 
         <input type="submit" value="Submit">
     </form>
 </body>
 </html>
+
+
 
