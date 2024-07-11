@@ -4,7 +4,7 @@ import MySQLdb.cursors
 import hashlib
 import os
 ## Not required if inputting manually 
-#import config
+import config
 
 app = Flask(__name__)
 
