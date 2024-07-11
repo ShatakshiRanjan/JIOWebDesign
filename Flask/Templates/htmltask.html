@@ -28,7 +28,8 @@
             font-weight: bold;
         }
         input[type="text"],
-        input[type="datetime-local"],
+        input[type="date"],
+        input[type="time"],
         select,
         textarea {
             width: 100%;
@@ -58,11 +59,17 @@
         <label for="task">Task:</label>
         <input type="text" id="task" name="task"><br><br>
 
-        <label for="dateOfTaskStart">Start:</label>
-        <input type="datetime-local" id="dateOfTaskStart" name="dateOfTaskStart"><br><br>
+        <label for="dateOfTaskStart">Start Date:</label>
+        <input type="date" id="dateOfTaskStart" name="dateOfTaskStart"><br><br>
 
-        <label for="dateOfTaskEnd">End:</label>
-        <input type="datetime-local" id="dateOfTaskEnd" name="dateOfTaskEnd"><br><br>
+        <label for="timeOfTaskStart">Start Time:</label>
+        <input type="time" id="timeOfTaskStart" name="timeOfTaskStart"><br><br>
+
+        <label for="dateOfTaskEnd">End Date:</label>
+        <input type="date" id="dateOfTaskEnd" name="dateOfTaskEnd"><br><br>
+
+        <label for="timeOfTaskEnd">End Time:</label>
+        <input type="time" id="timeOfTaskEnd" name="timeOfTaskEnd"><br><br>
 
         <label for="dedicatedTo">Assigned To:</label>
         <select id="dedicatedTo" name="dedicatedTo">
@@ -78,3 +85,4 @@
     </form>
 </body>
 </html>
+
