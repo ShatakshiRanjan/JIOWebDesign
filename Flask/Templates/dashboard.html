@@ -149,16 +149,14 @@
             <h3>Your Tasks</h3>
             <ul>
                 {% for task in tasks %}
-                    <li>{{ task['task'] }}</li>
+                    <li>
+                        <input type="checkbox" id="task{{ loop.index }}" name="task{{ loop.index }}" value="{{ task['task'] }}">
+                        <label for="task{{ loop.index }}">{{ task['task'] }}</label>
+                    </li>
                 {% endfor %}
             </ul>
         </div>
-        <p id="Home" class="current">
-            <!--<a href="{{ url_for('task') }}">Task</a>-->
-            
-            <button class="task-button">Task</button>
-
-        </p>
+        <button class="task-button" onclick="window.location.href='{{ url_for('task') }}';">Task Input</button>
     </div>
     <button class="back-button" onclick="history.back()">Go Back</button>
 </body>
