@@ -163,3 +163,4 @@ cython_debug/
 
 profiles.db
 task.db
+config.py

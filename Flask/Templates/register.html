@@ -8,43 +8,50 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename='Images/favicon.ico') }}">
 </head>
 <body>
-    <header>
-        <div class="container">
-            <div id="brand">
-                <h1>
-                    Taskify!
-                </h1>
+    <div class="wrapper">
+        <header>
+            <div class="container">
+                <div id="brand">
+                    <h1>
+                        Taskify!
+                    </h1>
+                </div>
+                <nav>
+                    <ul>
+                        <li id="Home">
+                            <a href="{{ url_for('home') }}">Home</a>
+                        </li>
+                        <li id="Login">
+                            <a href="{{ url_for('login') }}">Login</a>
+                        </li>
+                        <li id="Register" class="current">
+                            <a href="{{ url_for('register') }}">Register</a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
-            <nav>
-                <ul>
-                    <li id="Home">
-                        <a href="{{ url_for('home') }}">Home</a>
-                    </li>
-                    <li id="Login">
-                        <a href="{{ url_for('login') }}">Login</a>
-                    </li>
-                    <li id="Register" class="current">
-                        <a href="{{ url_for('register') }}">Register</a>
-                    </li>
-                </ul>
-            </nav>
+        </header>
+        <div id="register">
+            <h2>
+                Register
+            </h2>
+            <form method="POST">
+                <input type="email" name="email" id="email" placeholder="Email" required><br>
+                <input type="text" name="first_name" id="first_name" placeholder="First Name" required><br>
+                <input type="text" name="last_name" id="last_name" placeholder="Last Name" required><br>
+                <input type="password" name="password" id="password" placeholder="Password" required><br>
+                <input type="password" name="password2" id="password2" placeholder="Confirm Password" required><br><br>
+                <button type="submit">Register</button>
+                {% if error %}
+                <p style="color:red;">{{ error }}</p>
+                {% endif %}
+            </form>
         </div>
-    </header>
-    <div id="register">
-        <h2>
-            Register
-        </h2>
-        <form method="POST">
-            <input type="email" name="email" id="email" placeholder="Email" required><br>
-            <input type="text" name="first_name" id="first_name" placeholder="First Name" required><br>
-            <input type="text" name="last_name" id="last_name" placeholder="Last Name" required><br>
-            <input type="password" name="password" id="password" placeholder="Password" required><br>
-            <input type="password" name="password2" id="password2" placeholder="Confirm Password" required><br><br>
-            <button type="submit">Register</button>
-            {% if error %}
-            <p style="color:red;">{{ error }}</p>
-            {% endif %}
-        </form>
+        <footer>
+            <p>
+                &copy; 2024 Taskify! | All Rights Reserved
+            </p>
+        </footer>
     </div>
 </body>
 </html>
