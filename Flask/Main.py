@@ -1,7 +1,12 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from flask_mysqldb import MySQL
 import MySQLdb.cursors
 import hashlib
+import os
+import datetime
+from apscheduler.schedulers.background import BackgroundScheduler
+## Not required if inputting manually 
+import config
 
 app = Flask(__name__)
 
@@ -16,6 +21,18 @@ app.config['MYSQL_DB'] = 'Taskify'
 
 # Initialize MySQL
 mysql = MySQL(app)
+
+# Scheduler to remove old completed tasks
+scheduler = BackgroundScheduler()
+
+def remove_old_completed_tasks():
+    cursor = mysql.connection.cursor()
+    cursor.execute("DELETE FROM tasks WHERE completed = TRUE AND completion_date < NOW() - INTERVAL 30 DAY")
+    mysql.connection.commit()
+    cursor.close()
+
+scheduler.add_job(func=remove_old_completed_tasks, trigger="interval", days=1)
+scheduler.start()
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -97,7 +114,7 @@ def nextpage():
             first_name = user['first_name'] if user else None
 
             # Fetch tasks for the user using the dedicatedTo column
-            cursor.execute("SELECT task FROM tasks WHERE dedicatedTo = %s", (user_id,))
+            cursor.execute("SELECT TID, task FROM tasks WHERE dedicatedTo = %s AND completed = FALSE", (user_id,))
             tasks = cursor.fetchall()
         
         cursor.close()
@@ -136,6 +153,32 @@ def submit_task():
     
     return redirect('/task')
 
+@app.route('/complete_task', methods=['POST'])
+def complete_task():
+    user_id = session.get("user_id")
+    if not user_id:
+        return redirect(url_for('login'))
+
+    task_id = request.form['task_id']
+    cursor = mysql.connection.cursor()
+    cursor.execute("UPDATE tasks SET completed = TRUE, completion_date = NOW() WHERE TID = %s AND dedicatedTo = %s", (task_id, user_id))
+    mysql.connection.commit()
+    cursor.close()
+    
+    return jsonify(success=True)
+
+@app.route('/completed_tasks')
+def completed_tasks():
+    user_id = session.get("user_id")
+    if not user_id:
+        return redirect(url_for('login'))
+
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute("SELECT id, task FROM tasks WHERE dedicatedTo = %s AND completed = TRUE", (user_id,))
+    tasks = cursor.fetchall()
+    cursor.close()
+    
+    return render_template('completed_tasks.html', tasks=tasks)
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)
-
