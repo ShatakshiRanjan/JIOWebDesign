@@ -134,24 +134,25 @@ def task():
 
 @app.route('/submit_task', methods=['POST'])
 def submit_task():
-    user_id = session.get("user_id")
-    if not user_id:
-        return redirect(url_for('login'))
-
     task = request.form['task']
     dateOfTaskStart = request.form['dateOfTaskStart']
+    timeOfTaskStart = request.form['timeOfTaskStart']
     dateOfTaskEnd = request.form['dateOfTaskEnd']
-    dedicatedTo = request.form['dedicatedTo']
+    timeOfTaskEnd = request.form['timeOfTaskEnd']
+    dedicatedTo = session.get("user_id")
     descript = request.form['descript']
-    
+    user_id = session.get("user_id")
+
+    sql = "INSERT INTO tasks (task, dateOfTaskStart, timeOfTaskStart, dateOfTaskEnd, timeOfTaskEnd, dedicatedTo, descript, user_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+    val = (task, dateOfTaskStart, timeOfTaskStart, dateOfTaskEnd, timeOfTaskEnd, dedicatedTo, descript, user_id)
+
     cursor = mysql.connection.cursor()
-    sql = "INSERT INTO tasks (user_id, task, dateOfTaskStart, dateOfTaskEnd, dedicatedTo, descript) VALUES (%s, %s, %s, %s, %s, %s)"
-    val = (user_id, task, dateOfTaskStart, dateOfTaskEnd, dedicatedTo, descript)
     cursor.execute(sql, val)
     mysql.connection.commit()
     cursor.close()
-    
-    return redirect('/task')
+
+    return redirect(url_for('task'))
+
 
 @app.route('/complete_task', methods=['POST'])
 def complete_task():
@@ -159,7 +160,7 @@ def complete_task():
     if not user_id:
         return redirect(url_for('login'))
 
-    task_id = request.form['task_id']
+    task_id = request.json.get('task_id')  # Assuming you're sending JSON data
     cursor = mysql.connection.cursor()
     cursor.execute("UPDATE tasks SET completed = TRUE, completion_date = NOW() WHERE TID = %s AND dedicatedTo = %s", (task_id, user_id))
     mysql.connection.commit()
@@ -174,11 +175,27 @@ def completed_tasks():
         return redirect(url_for('login'))
 
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cursor.execute("SELECT id, task FROM tasks WHERE dedicatedTo = %s AND completed = TRUE", (user_id,))
+    cursor.execute("SELECT TID, task FROM tasks WHERE dedicatedTo = %s AND completed = TRUE", (user_id,))
     tasks = cursor.fetchall()
     cursor.close()
     
     return render_template('completed_tasks.html', tasks=tasks)
+
+@app.route('/mark_incomplete', methods=['POST'])
+def mark_incomplete():
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({'success': False, 'message': 'User not logged in'}), 401
+
+    task_id = request.json.get('task_id')
+    cursor = mysql.connection.cursor()
+    cursor.execute("UPDATE tasks SET completed = FALSE, completion_date = NULL WHERE TID = %s AND dedicatedTo = %s", (task_id, user_id))
+    mysql.connection.commit()
+    cursor.close()
+
+    return jsonify({'success': True}), 200
+
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)

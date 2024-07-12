@@ -76,8 +76,8 @@
             <ul>
                 {% for task in tasks %}
                     <li>
-                        <input type="checkbox" id="task{{ task['id'] }}" name="task{{ task['id'] }}" value="{{ task['id'] }}" onclick="completeTask({{ task['id'] }})">
-                        <label for="task{{ task['id'] }}">{{ task['task'] }}</label>
+                        <input type="checkbox" id="task{{ task['TID'] }}" name="task{{ task['TID'] }}" value="{{ task['TID'] }}" {% if task['completed'] %} checked {% endif %} onclick="completeTask({{ task['TID'] }})">
+                        <label for="task{{ task['TID'] }}">{{ task['task'] }}</label>
                     </li>
                 {% endfor %}
             </ul>
@@ -96,11 +96,23 @@
                 },
                 body: JSON.stringify({ task_id: taskId }),
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
-                    location.reload();
+                    location.reload();  // Reload the page to update task list
+                } else {
+                    console.error('Task completion failed:', data.message);
+                    // Optionally show an error message to the user
                 }
+            })
+            .catch(error => {
+                console.error('Error completing task:', error);
+                // Optionally show an error message to the user
             });
         }
     </script>
