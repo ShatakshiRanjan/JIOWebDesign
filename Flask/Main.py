@@ -22,6 +22,10 @@ app.config['MYSQL_DB'] = 'Taskify'
 # Initialize MySQL
 mysql = MySQL(app)
 
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static', 'Images'),
+                               'favicon.ico')
+
 # Scheduler to remove old completed tasks
 scheduler = BackgroundScheduler()
 
@@ -96,7 +100,8 @@ def login():
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    Background = os.path.join(os.path.join("static", "Images"), "background_1.jpg")
+    return render_template('index.html', user_image=Background)
 
 @app.route('/dashboard')
 def nextpage():
@@ -199,3 +204,4 @@ def mark_incomplete():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)
+
