@@ -104,15 +104,13 @@
             })
             .then(data => {
                 if (data.success) {
-                    location.reload();  // Reload the page to update task list
+                    location.reload(); 
                 } else {
                     console.error('Task completion failed:', data.message);
-                    // Optionally show an error message to the user
                 }
             })
             .catch(error => {
                 console.error('Error completing task:', error);
-                // Optionally show an error message to the user
             });
         }
     </script>
