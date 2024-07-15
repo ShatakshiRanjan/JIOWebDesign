@@ -1,12 +1,12 @@
--- Database 
+#Database 
 CREATE DATABASE  IF NOT EXISTS `Taskify`
 USE `Taskify`;
 
--- Drop tables if they exist (optional)
+#Drop tables if they exist (optional)
 DROP TABLE IF EXISTS tasks;
 DROP TABLE IF EXISTS users;
 
--- Create users table
+#Create users table
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) NOT NULL,
@@ -15,19 +15,21 @@ CREATE TABLE users (
     passw VARCHAR(255) NOT NULL
 );
 
--- Create tasks table
+#Create tasks table
 CREATE TABLE tasks (
     TID INT AUTO_INCREMENT PRIMARY KEY,
     task TEXT NOT NULL,
     dateOfTaskStart DATE NOT NULL,
+    timeOfTaskStart TIME NOT NULL,
     dateOfTaskEnd DATE NOT NULL,
+    timeOfTaskEnd TIME NOT NULL,
     dedicatedTo INT NOT NULL,
     descript TEXT NOT NULL,
+    user_id INT,
+    completed BOOLEAN DEFAULT FALSE,
+    completion_date TIMESTAMP NULL DEFAULT NULL,
     FOREIGN KEY (dedicatedTo) REFERENCES users(id)
 );
 
-ALTER TABLE tasks ADD COLUMN user_id INT;
-
 select * from tasks;
 select * from users;
-

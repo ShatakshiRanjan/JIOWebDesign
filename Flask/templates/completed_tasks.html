@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>Completed Tasks</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -15,7 +15,7 @@
             justify-content: center;
             height: 100vh;
         }
-        .dashboard-container {
+        .tasks-container {
             width: 80%;
             max-width: 800px;
             margin: 0 auto;
@@ -47,49 +47,37 @@
             right: 10px;
             z-index: 10; /* Ensure the button is on top of other elements */
         }
-        .task-button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            font-size: 16px;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: background-color 0.3s ease, transform 0.3s ease;
-        }
-
-        .task-button:hover {
-            background-color: #0056b3;
-        }
-
-        .task-button:active {
-            transform: scale(0.98);
-        }
     </style>
     <link rel="shortcut icon" href="{{ url_for('static', filename='Images/favicon.ico') }}">
 </head>
 <body>
-    <div class="dashboard-container">
-        <h1>Hello, {{ first_name }}</h1>
+    <div class="tasks-container">
+        <h1>Completed Tasks</h1>
         <div class="section">
-            <h3>Your Tasks</h3>
+            <h3>Tasks</h3>
             <ul>
                 {% for task in tasks %}
                     <li>
-                        <input type="checkbox" id="task{{ task['TID'] }}" name="task{{ task['TID'] }}" value="{{ task['TID'] }}" {% if task['completed'] %} checked {% endif %} onclick="completeTask({{ task['TID'] }})">
+                        <input type="checkbox" id="task{{ task['TID'] }}" name="task{{ task['TID'] }}" value="{{ task['TID'] }}" checked>
                         <label for="task{{ task['TID'] }}">{{ task['task'] }}</label>
                     </li>
                 {% endfor %}
             </ul>
         </div>
-        <button class="task-button" onclick="window.location.href='{{ url_for('task') }}';">Task Input</button>
-        <button class="task-button" onclick="window.location.href='{{ url_for('completed_tasks') }}';">View Completed Tasks</button>
     </div>
     <button class="back-button" onclick="history.back()">Go Back</button>
 
     <script>
-        function completeTask(taskId) {
-            fetch('/complete_task', {
+        document.querySelectorAll('input[type="checkbox"]').forEach(item => {
+            item.addEventListener('change', event => {
+                if (!event.target.checked) {
+                    markIncomplete(event.target.value);
+                }
+            });
+        });
+
+        function markIncomplete(taskId) {
+            fetch('/mark_incomplete', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -106,12 +94,12 @@
                 if (data.success) {
                     location.reload();  // Reload the page to update task list
                 } else {
-                    console.error('Task completion failed:', data.message);
+                    console.error('Marking task incomplete failed:', data.message);
                     // Optionally show an error message to the user
                 }
             })
             .catch(error => {
-                console.error('Error completing task:', error);
+                console.error('Error marking task incomplete:', error);
                 // Optionally show an error message to the user
             });
         }
