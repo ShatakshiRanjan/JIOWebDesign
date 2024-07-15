@@ -22,51 +22,24 @@ ul{
     padding:0;
 }
 
-.wrapper{
-    position: relative;
-    overflow: hidden;
-    width: 100%;
-    height: 100%;
-}
-
-.wrapper::before{  
-    /* animation: zoom 60s linear infinite alternate; */
-    /* background-image: url("Images/background_2.jpg"); */
-    /* background: url("Images/2430568.jpg");
-    background-size: cover;
-    background-position: center;
-    height: 100vh;
-    width: 100vw;
-    opacity: 1;
-    overflow: hidden;
-    scale: 1; */
-    /* flex: 1;
-    background-image: url("Images/20536905.jpg");
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center;
-    animation: slidein 2s ease-in-out;
-    animation-fill-mode: forwards; */
-    /* animation: zoom 20s linear infinite alternate; */
-
-    content: "";
-    position: absolute;
-    height: 100%;
-    width:100%;
-    /* top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0; */
-    background: url('Images/20536905.jpg') center center/cover;
-    z-index: -1;
-    animation: zoom 20s infinite alternate;
-}
-
-/* .wrapper{
+.wrapper {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-} */
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+}
+
+.wrapper::before {
+    content: "";
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background: url('Images/20536905.jpg') center center/cover no-repeat;
+    z-index: -1;
+    animation: zoom 20s infinite alternate;
+}
 
 /* HEADERS */
 header{
@@ -80,14 +53,14 @@ header{
     animation: slide_down 1s ease-in-out;
 }
 
-@keyframes slide_down {
+/*@keyframes slide_down {
     0% {
         transform: translateY(-100%);
     }
     100% {
         transform: translateY(0);
     }
-}
+}*/
 
 
 header a{
@@ -253,15 +226,18 @@ main{
 }
 
 /* Footer */
-footer{
-    background:#522056;
-    color:rgb(231, 180, 51);
-    text-align:center;
+footer {
+    background: #522056;
+    color: rgb(231, 180, 51);
+    text-align: center;
     justify-content: center;
-    margin:0;
-    padding:4px;
-    /* animation: slide_side 2s ease-in-out; */
+    margin: 0;
+    padding: 4px;
+    position: absolute;
+    width: 100%;
+    bottom: 0;
 }
+
 @keyframes slide_side{
     0% {
         transform: translateX(120%);

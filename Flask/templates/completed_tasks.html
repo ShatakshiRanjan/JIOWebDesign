@@ -92,15 +92,13 @@
             })
             .then(data => {
                 if (data.success) {
-                    location.reload();  // Reload the page to update task list
+                    location.reload();
                 } else {
                     console.error('Marking task incomplete failed:', data.message);
-                    // Optionally show an error message to the user
                 }
             })
             .catch(error => {
                 console.error('Error marking task incomplete:', error);
-                // Optionally show an error message to the user
             });
         }
     </script>
