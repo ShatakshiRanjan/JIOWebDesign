@@ -53,14 +53,14 @@ header{
     animation: slide_down 1s ease-in-out;
 }
 
-@keyframes slide_down {
+/*@keyframes slide_down {
     0% {
         transform: translateY(-100%);
     }
     100% {
         transform: translateY(0);
     }
-}
+}*/
 
 
 header a{
