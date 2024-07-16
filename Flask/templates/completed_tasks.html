@@ -23,8 +23,10 @@
                         data-end-time="{{ task['timeOfTaskEnd'] }}"
                         data-dedicated-to="{{ task['dedicatedTo'] }}"
                         data-description="{{ task['descript'] }}">
+                        <div class="checkbox-container">
                         <input type="checkbox" id="task{{ task['TID'] }}" name="task{{ task['TID'] }}" value="{{ task['TID'] }}" checked>
                         <label for="task{{ task['TID'] }}">{{ task['task'] }}</label>
+                        <button class="delete-button" onclick="deleteTask({{ task['TID'] }})">✖</button>
                     </li>
                 {% endfor %}
             </ul>

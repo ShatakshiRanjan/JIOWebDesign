@@ -25,6 +25,7 @@
                         data-description="{{ task['descript'] }}">
                         <input type="checkbox" id="task{{ task['TID'] }}" name="task{{ task['TID'] }}" value="{{ task['TID'] }}" {% if task['completed'] %} checked {% endif %} onclick="completeTask({{ task['TID'] }})">
                         <label for="task{{ task['TID'] }}">{{ task['task'] }}</label>
+                        <button class="delete-button" onclick="deleteTask({{ task['TID'] }})">✖</button>
                     </li>
                 {% endfor %}
             </ul>

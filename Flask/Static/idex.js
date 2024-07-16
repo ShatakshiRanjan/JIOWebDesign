@@ -70,3 +70,37 @@ function markIncomplete(taskId) {
         console.error('Error marking task incomplete:', error);
     });
 }
+
+function deleteTask(taskId) {
+    fetch('/delete_task', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ task_id: taskId }),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            console.error('Task deletion failed:', data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error deleting task:', error);
+    });
+}
+
+document.querySelectorAll('.delete-button').forEach(button => {
+    button.addEventListener('click', event => {
+        event.stopPropagation(); // Prevent triggering other click events
+        const taskId = event.currentTarget.parentElement.querySelector('input[type="checkbox"]').value;
+        deleteTask(taskId);
+    });
+});

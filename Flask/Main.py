@@ -139,6 +139,26 @@ def nextpage():
     
     return redirect(url_for('login'))
 
+@app.route('/delete_task', methods=['POST'])
+def delete_task():
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify(success=False, message="User not logged in"), 401
+
+    task_id = request.json.get('task_id')  # Assuming you're sending JSON data
+    if not task_id:
+        return jsonify(success=False, message="Task ID not provided"), 400
+
+    try:
+        cursor = mysql.connection.cursor()
+        cursor.execute("DELETE FROM tasks WHERE TID = %s AND dedicatedTo = %s", (task_id, user_id))
+        mysql.connection.commit()
+        cursor.close()
+        return jsonify(success=True)
+    except Exception as e:
+        print(f"Error deleting task: {e}")
+        return jsonify(success=False, message="Database error"), 500
+
 
 @app.route('/task')
 def task():
