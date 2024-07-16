@@ -13,11 +13,17 @@ app = Flask(__name__)
 # Change this to your secret key (it can be anything, it's for extra protection)
 app.secret_key = 'your secret key'
 
-# Enter your database connection details below
-app.config['MYSQL_HOST'] = '127.0.0.1'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 't9dGn6iug*5hdj_'
-app.config['MYSQL_DB'] = 'Taskify'
+# Enter your database connection details manually
+#app.config['MYSQL_HOST'] = '127.0.0.1'
+#app.config['MYSQL_USER'] = 'root'
+#app.config['MYSQL_PASSWORD'] = 'password'
+#app.config['MYSQL_DB'] = 'Taskify'
+
+# Else: for information stored in config.py
+app.config['MYSQL_HOST'] = config.MYSQL_HOST
+app.config['MYSQL_USER'] = config.MYSQL_USER
+app.config['MYSQL_PASSWORD'] = config.MYSQL_PASSWORD
+app.config['MYSQL_DB'] = config.MYSQL_DB
 
 # Initialize MySQL
 mysql = MySQL(app)
