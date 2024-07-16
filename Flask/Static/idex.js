@@ -1,0 +1,72 @@
+document.querySelectorAll('.task-item').forEach(item => {
+    item.addEventListener('click', event => {
+        const taskDetails = event.currentTarget.dataset;
+        document.getElementById('details-task').textContent = taskDetails.task;
+        document.getElementById('details-start-date').textContent = taskDetails.startDate;
+        document.getElementById('details-start-time').textContent = taskDetails.startTime;
+        document.getElementById('details-end-date').textContent = taskDetails.endDate;
+        document.getElementById('details-end-time').textContent = taskDetails.endTime;
+        //document.getElementById('details-dedicated-to').textContent = taskDetails.dedicatedTo;
+        document.getElementById('details-description').textContent = taskDetails.description;
+    });
+});
+
+function completeTask(taskId) {
+    fetch('/complete_task', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ task_id: taskId }),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            location.reload(); 
+        } else {
+            console.error('Task completion failed:', data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error completing task:', error);
+    });
+}
+
+document.querySelectorAll('input[type="checkbox"]').forEach(item => {
+    item.addEventListener('change', event => {
+        if (!event.target.checked) {
+            markIncomplete(event.target.value);
+        }
+    });
+});
+
+function markIncomplete(taskId) {
+    fetch('/mark_incomplete', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ task_id: taskId }),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            console.error('Marking task incomplete failed:', data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error marking task incomplete:', error);
+    });
+}
