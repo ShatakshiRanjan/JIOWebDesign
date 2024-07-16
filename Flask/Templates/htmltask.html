@@ -67,33 +67,6 @@
     </style>
 </head>
 <body>
-    <div class="wrapper">
-        <header>
-            <div class="container">
-                <div id="brand">
-                    <h1>
-                        Taskify!
-                    </h1>
-                </div>
-                <nav>
-                    <ul>
-                        <li id="Home" class="current">
-                            <a href="{{ url_for('home') }}">Home</a>
-                        </li>
-                        <li id="Login">
-                            <a href="{{ url_for('login') }}">Login</a>
-                        </li>
-                        <li id="Register">
-                            <a href="{{ url_for('register') }}">Register</a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-        </header>
-        <main>
-            
-        </main>
-    </div>
     <h1>Task Form</h1>
     <form method="POST" action="/submit_task">
         <div class="form-group">
