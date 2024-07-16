@@ -119,7 +119,11 @@ def nextpage():
             first_name = user['first_name'] if user else None
 
             # Fetch tasks for the user using the dedicatedTo column
-            cursor.execute("SELECT TID, task FROM tasks WHERE dedicatedTo = %s AND completed = FALSE", (user_id,))
+            cursor.execute("""
+                SELECT TID, task, dateOfTaskStart, timeOfTaskStart, dateOfTaskEnd, timeOfTaskEnd, dedicatedTo, descript 
+                FROM tasks 
+                WHERE dedicatedTo = %s AND completed = FALSE
+            """, (user_id,))
             tasks = cursor.fetchall()
         
         cursor.close()
@@ -128,6 +132,7 @@ def nextpage():
             return render_template('dashboard.html', first_name=first_name, tasks=tasks)
     
     return redirect(url_for('login'))
+
 
 @app.route('/task')
 def task():
