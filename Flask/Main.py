@@ -191,7 +191,12 @@ def completed_tasks():
         return redirect(url_for('login'))
 
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cursor.execute("SELECT TID, task FROM tasks WHERE dedicatedTo = %s AND completed = TRUE", (user_id,))
+    # Fetch tasks for the user using the dedicatedTo column
+    cursor.execute("""
+        SELECT TID, task, dateOfTaskStart, timeOfTaskStart, dateOfTaskEnd, timeOfTaskEnd, dedicatedTo, descript 
+        FROM tasks 
+        WHERE dedicatedTo = %s AND completed = TRUE
+    """, (user_id,))
     tasks = cursor.fetchall()
     cursor.close()
     
