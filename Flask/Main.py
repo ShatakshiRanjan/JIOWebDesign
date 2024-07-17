@@ -5,7 +5,6 @@ import hashlib
 import os
 import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
-## Not required if inputting manually 
 import config
 
 app = Flask(__name__)
@@ -13,7 +12,7 @@ app = Flask(__name__)
 # Change this to your secret key (it can be anything, it's for extra protection)
 app.secret_key = 'your secret key'
 
-# Enter your datab  ase connection details manually
+# Enter your database connection details manually
 #app.config['MYSQL_HOST'] = '127.0.0.1'
 #app.config['MYSQL_USER'] = 'root'
 #app.config['MYSQL_PASSWORD'] = 'password'
@@ -124,11 +123,12 @@ def nextpage():
             user = cursor.fetchone()
             first_name = user['first_name'] if user else None
 
-            # Fetch tasks for the user using the dedicatedTo column
+            # Fetch tasks for the user using the task_assignments table
             cursor.execute("""
-                SELECT TID, task, dateOfTaskStart, timeOfTaskStart, dateOfTaskEnd, timeOfTaskEnd, dedicatedTo, descript 
+                SELECT tasks.TID, tasks.task, tasks.dateOfTaskStart, tasks.timeOfTaskStart, tasks.dateOfTaskEnd, tasks.timeOfTaskEnd, tasks.descript 
                 FROM tasks 
-                WHERE dedicatedTo = %s AND completed = FALSE
+                JOIN task_assignments ON tasks.TID = task_assignments.task_id
+                WHERE task_assignments.user_id = %s AND tasks.completed = FALSE
             """, (user_id,))
             tasks = cursor.fetchall()
         
@@ -151,14 +151,13 @@ def delete_task():
 
     try:
         cursor = mysql.connection.cursor()
-        cursor.execute("DELETE FROM tasks WHERE TID = %s AND dedicatedTo = %s", (task_id, user_id))
+        cursor.execute("DELETE FROM tasks WHERE TID = %s", (task_id,))
         mysql.connection.commit()
         cursor.close()
         return jsonify(success=True)
     except Exception as e:
         print(f"Error deleting task: {e}")
         return jsonify(success=False, message="Database error"), 500
-
 
 @app.route('/task')
 def task():
@@ -175,20 +174,27 @@ def submit_task():
     timeOfTaskStart = request.form['timeOfTaskStart']
     dateOfTaskEnd = request.form['dateOfTaskEnd']
     timeOfTaskEnd = request.form['timeOfTaskEnd']
-    dedicatedTo = session.get("user_id")
+    dedicatedTo = request.form.getlist('dedicatedTo[]')
     descript = request.form['descript']
     user_id = session.get("user_id")
 
-    sql = "INSERT INTO tasks (task, dateOfTaskStart, timeOfTaskStart, dateOfTaskEnd, timeOfTaskEnd, dedicatedTo, descript, user_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
-    val = (task, dateOfTaskStart, timeOfTaskStart, dateOfTaskEnd, timeOfTaskEnd, dedicatedTo, descript, user_id)
+    # Insert the task into the tasks table
+    sql_task = "INSERT INTO tasks (task, dateOfTaskStart, timeOfTaskStart, dateOfTaskEnd, timeOfTaskEnd, descript, user_id) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+    val_task = (task, dateOfTaskStart, timeOfTaskStart, dateOfTaskEnd, timeOfTaskEnd, descript, user_id)
 
     cursor = mysql.connection.cursor()
-    cursor.execute(sql, val)
+    cursor.execute(sql_task, val_task)
+    task_id = cursor.lastrowid
+
+    # Insert the task assignments into the task_assignments table
+    sql_assignment = "INSERT INTO task_assignments (task_id, user_id) VALUES (%s, %s)"
+    for user_id in dedicatedTo:
+        cursor.execute(sql_assignment, (task_id, user_id))
+    
     mysql.connection.commit()
     cursor.close()
 
     return redirect(url_for('task'))
-
 
 @app.route('/complete_task', methods=['POST'])
 def complete_task():
@@ -198,7 +204,7 @@ def complete_task():
 
     task_id = request.json.get('task_id')  # Assuming you're sending JSON data
     cursor = mysql.connection.cursor()
-    cursor.execute("UPDATE tasks SET completed = TRUE, completion_date = NOW() WHERE TID = %s AND dedicatedTo = %s", (task_id, user_id))
+    cursor.execute("UPDATE tasks SET completed = TRUE, completion_date = NOW() WHERE TID = %s", (task_id,))
     mysql.connection.commit()
     cursor.close()
     
@@ -211,11 +217,12 @@ def completed_tasks():
         return redirect(url_for('login'))
 
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    # Fetch tasks for the user using the dedicatedTo column
+    # Fetch completed tasks for the user using the task_assignments table
     cursor.execute("""
-        SELECT TID, task, dateOfTaskStart, timeOfTaskStart, dateOfTaskEnd, timeOfTaskEnd, dedicatedTo, descript 
+        SELECT tasks.TID, tasks.task, tasks.dateOfTaskStart, tasks.timeOfTaskStart, tasks.dateOfTaskEnd, tasks.timeOfTaskEnd, tasks.descript 
         FROM tasks 
-        WHERE dedicatedTo = %s AND completed = TRUE
+        JOIN task_assignments ON tasks.TID = task_assignments.task_id
+        WHERE task_assignments.user_id = %s AND tasks.completed = TRUE
     """, (user_id,))
     tasks = cursor.fetchall()
     cursor.close()
@@ -230,13 +237,12 @@ def mark_incomplete():
 
     task_id = request.json.get('task_id')
     cursor = mysql.connection.cursor()
-    cursor.execute("UPDATE tasks SET completed = FALSE, completion_date = NULL WHERE TID = %s AND dedicatedTo = %s", (task_id, user_id))
+    cursor.execute("UPDATE tasks SET completed = FALSE, completion_date = NULL WHERE TID = %s", (task_id,))
     mysql.connection.commit()
     cursor.close()
 
     return jsonify({'success': True}), 200
 
-
-
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)
+

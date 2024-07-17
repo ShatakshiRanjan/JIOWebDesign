@@ -1,8 +1,8 @@
-#Database 
-CREATE DATABASE  IF NOT EXISTS `Taskify`
+CREATE DATABASE  IF NOT EXISTS `Taskify`;
 USE `Taskify`;
 
 #Drop tables if they exist (optional)
+DROP TABLE IF EXISTS task_assignments;
 DROP TABLE IF EXISTS tasks;
 DROP TABLE IF EXISTS users;
 
@@ -23,13 +23,21 @@ CREATE TABLE tasks (
     timeOfTaskStart TIME NOT NULL,
     dateOfTaskEnd DATE NOT NULL,
     timeOfTaskEnd TIME NOT NULL,
-    dedicatedTo INT NOT NULL,
     descript TEXT NOT NULL,
     user_id INT,
     completed BOOLEAN DEFAULT FALSE,
-    completion_date TIMESTAMP NULL DEFAULT NULL,
-    FOREIGN KEY (dedicatedTo) REFERENCES users(id)
+    completion_date TIMESTAMP NULL DEFAULT NULL
 );
 
+#Create task_assignments table
+CREATE TABLE task_assignments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    task_id INT NOT NULL,
+    user_id INT NOT NULL,
+    FOREIGN KEY (task_id) REFERENCES tasks(TID),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+select * from task_assignments;
 select * from tasks;
 select * from users;
