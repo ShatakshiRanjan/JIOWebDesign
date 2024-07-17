@@ -13,11 +13,17 @@ app = Flask(__name__)
 # Change this to your secret key (it can be anything, it's for extra protection)
 app.secret_key = 'your secret key'
 
-# Enter your database connection details below
-app.config['MYSQL_HOST'] = '127.0.0.1'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'root'
-app.config['MYSQL_DB'] = 'Taskify'
+# Enter your datab  ase connection details manually
+#app.config['MYSQL_HOST'] = '127.0.0.1'
+#app.config['MYSQL_USER'] = 'root'
+#app.config['MYSQL_PASSWORD'] = 'password'
+#app.config['MYSQL_DB'] = 'Taskify'
+
+# Else: for information stored in config.py
+app.config['MYSQL_HOST'] = config.MYSQL_HOST
+app.config['MYSQL_USER'] = config.MYSQL_USER
+app.config['MYSQL_PASSWORD'] = config.MYSQL_PASSWORD
+app.config['MYSQL_DB'] = config.MYSQL_DB
 
 # Initialize MySQL
 mysql = MySQL(app)
@@ -133,6 +139,26 @@ def nextpage():
     
     return redirect(url_for('login'))
 
+@app.route('/delete_task', methods=['POST'])
+def delete_task():
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify(success=False, message="User not logged in"), 401
+
+    task_id = request.json.get('task_id')  # Assuming you're sending JSON data
+    if not task_id:
+        return jsonify(success=False, message="Task ID not provided"), 400
+
+    try:
+        cursor = mysql.connection.cursor()
+        cursor.execute("DELETE FROM tasks WHERE TID = %s AND dedicatedTo = %s", (task_id, user_id))
+        mysql.connection.commit()
+        cursor.close()
+        return jsonify(success=True)
+    except Exception as e:
+        print(f"Error deleting task: {e}")
+        return jsonify(success=False, message="Database error"), 500
+
 
 @app.route('/task')
 def task():
@@ -185,7 +211,12 @@ def completed_tasks():
         return redirect(url_for('login'))
 
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cursor.execute("SELECT TID, task FROM tasks WHERE dedicatedTo = %s AND completed = TRUE", (user_id,))
+    # Fetch tasks for the user using the dedicatedTo column
+    cursor.execute("""
+        SELECT TID, task, dateOfTaskStart, timeOfTaskStart, dateOfTaskEnd, timeOfTaskEnd, dedicatedTo, descript 
+        FROM tasks 
+        WHERE dedicatedTo = %s AND completed = TRUE
+    """, (user_id,))
     tasks = cursor.fetchall()
     cursor.close()
     

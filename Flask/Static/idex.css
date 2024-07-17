@@ -34,6 +34,8 @@ body{
     border-radius: 5px;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
     cursor: pointer;
+    justify-content: space-between;
+    display: flex;
 }
 .section ul li:hover {
     background-color: #f0f0f0;
@@ -75,4 +77,25 @@ body{
     justify-content: center;
     align-items: center;
     float:right;
+}
+
+.delete-button {
+    background: none;
+    border: none;
+    color: red;
+    font-size: 1.2em;
+    cursor: pointer;
+}
+
+.delete-button:hover {
+    color: darkred;
+}
+
+.task-item label {
+    flex-grow: 1;
+    margin-left: 10px;
+}
+
+.task-item input[type="checkbox"] {
+    margin-left: 10px;
 }
