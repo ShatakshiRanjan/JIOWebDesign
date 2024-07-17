@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Taskify! | Welcome</title>
+    <link rel ="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='Images/favicon.ico') }}">
+</head>
+<body>
+    <div class="wrapper">
+        <header>
+            <div class="container">
+                <div id="brand">
+                    <h1>
+                        Taskify!
+                    </h1>
+                </div>
+                <nav>
+                    <ul>
+                        <li id="Home" class="current">
+                            <a href="{{ url_for('home') }}">Home</a>
+                        </li>
+                        <li id="Login">
+                            <a href="{{ url_for('login') }}">Login</a>
+                        </li>
+                        <li id="Register">
+                            <a href="{{ url_for('register') }}">Register</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+        <main>
+
+            <div id="index-detail-box">
+                <div id="index-detail">
+                    <h2>
+                        Welcome to Taskify!
+                    </h2>
+                    <p>
+                        Taskify is your ultimate task management solution designed to streamline productivity and foster collaboration across your team. Whether you're managing a small project or coordinating a large team, Taskify helps you organize tasks, set priorities, and track progress with ease.
+                    </p>
+                    <h3>
+                        Why Taskify?
+                    </h3>
+                    <p>
+                        In today's fast-paced work environment, staying organized and maintaining productivity is more crucial than ever. Taskify is crafted to simplify the complexities of task management, ensuring that you and your team stay on top of every project milestone.
+                    </p>
+                    <h3>    
+                        Key Features: 
+                    </h3>
+                    <ol>
+                        <li>
+                            <span class="olist_heading">Collaborative Task Management:</span><br>     
+                            Taskify allows you to create, assign, and monitor tasks in real-time, ensuring every team member knows their responsibilities and deadlines.
+                        </li>
+                        <li>
+                            <span class="olist_heading">Seamless Communication:</span><br>
+                              With built-in messaging and commenting features, Taskify fosters clear and continuous communication, reducing the need for endless email threads and meetings.
+                        </li>
+                        <li>
+                            <span class="olist_heading">Priority and Deadline Tracking:</span><br>
+                              Set priorities and deadlines to ensure that important tasks are highlighted and completed on time. Taskify's intuitive interface makes it easy to adjust and update tasks as priorities shift.
+                        </li>
+                        <li>
+                            <span class="olist_heading">Visual Progress Monitoring:</span><br>
+                              Our visual tools, including Gantt charts and progress bars, provide an at-a-glance view of project status, helping you quickly identify any bottlenecks or delays.
+                        </li>
+                        <li>
+                            <span class="olist_heading">Integration with Popular Tools:</span><br>
+                              Taskify seamlessly integrates with other productivity tools you already use, such as calendars, file sharing services, and communication platforms, creating a unified workflow.
+                        </li>
+                        <li>
+                            <span class="olist_heading">Customizable Workflows:</span><br>
+                              Tailor Taskify to fit your team's unique processes. Create custom workflows, labels, and tags to categorize tasks in a way that makes sense for you.
+                        </li>
+                        <li>
+                            <span class="olist_heading">Mobile Accessibility:</span><br>
+                              Stay connected and productive on the go with Taskify's mobile app. Manage tasks, communicate with your team, and track progress from anywhere.
+                        </li>
+                    </ol>
+                    <h3>
+                        Benefits for Your Team:
+                    </h3>
+                    <ul>
+                        <li><span class="ulist-heading">Enhanced Collaboration:</span> Break down silos and improve teamwork with shared task lists and transparent progress tracking.</li>
+                        <li><span class="ulist-heading">Increased Productivity:</span> Focus on what matters most by clearly defining tasks, priorities, and deadlines.</li>
+                        <li><span class="ulist-heading">Reduced Stress:</span> Stay organized and in control with an intuitive platform that makes task management straightforward and efficient.</li>
+                    </ul>
+                    <h3>
+                        Get Started with Taskify:
+                    </h3>
+                    <p>
+                        Join the growing number of teams transforming their productivity with Taskify. Sign up today and experience the difference effective task management can make.
+                    </p>
+                        <hr>
+                        With Taskify, managing your team’s tasks has never been easier. Empower your team to achieve more and keep every project on track with our comprehensive task management tool.                    
+                </div>
+            </div>
+        </main>
+            <!-- <img src="{{user_image}}" alt="Background"> -->
+        <footer>
+            <p>
+                &copy; 2024 Taskify! | All Rights Reserved
+            </p>
+        </footer>
+    </div>
+</body>
+</html>
