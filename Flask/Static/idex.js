@@ -104,3 +104,12 @@ document.querySelectorAll('.delete-button').forEach(button => {
         deleteTask(taskId);
     });
 });
+
+window.onload = function() {
+    if (!sessionStorage.getItem('reloaded')) {
+        sessionStorage.setItem('reloaded', 'yes');
+        window.location.reload();
+    } else {
+        sessionStorage.removeItem('reloaded');
+    }
+};
