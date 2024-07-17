@@ -1,5 +1,5 @@
 document.querySelectorAll('.task-item').forEach(item => {
-    item.addEventListener('click', event => {
+    item.addEventListener('mouseover', event => {
         const taskDetails = event.currentTarget.dataset;
         document.getElementById('details-task').textContent = taskDetails.task;
         document.getElementById('details-start-date').textContent = taskDetails.startDate;
