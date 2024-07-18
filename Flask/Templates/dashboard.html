@@ -4,44 +4,70 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel ="stylesheet" href="{{ url_for('static', filename='idex.css') }}">
+    <link rel ="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="{{ url_for('static', filename='idex.js') }}" defer></script>
     <title>Dashboard</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='Images/favicon.ico') }}">
 </head>
 <body>
-    <div class="task-container">
-        <h1>Hello, {{ first_name }}</h1>
-        <div class="section">
-            <h3>Your Tasks</h3>
-            <ul id="tasks-list">
-                {% for task in tasks %}
-                    <li class="task-item"
-                        data-task="{{ task['task'] }}"
-                        data-start-date="{{ task['dateOfTaskStart'] }}"
-                        data-start-time="{{ task['timeOfTaskStart'] }}"
-                        data-end-date="{{ task['dateOfTaskEnd'] }}"
-                        data-end-time="{{ task['timeOfTaskEnd'] }}"
-                        data-dedicated-to="{{ task['dedicatedTo'] }}"
-                        data-description="{{ task['descript'] }}">
-                        <input type="checkbox" id="task{{ task['TID'] }}" name="task{{ task['TID'] }}" value="{{ task['TID'] }}" {% if task['completed'] %} checked {% endif %} onclick="completeTask({{ task['TID'] }})">
-                        <label for="task{{ task['TID'] }}">{{ task['task'] }}</label>
-                        <button class="delete-button" onclick="deleteTask({{ task['TID'] }})">✖</button>
+    <header>
+        <div class="container">
+            <div id="brand">
+                <h1>
+                    Taskify!
+                </h1>
+            </div>
+            <nav>
+                <ul>
+                    <li id="Dashboard" class="current">
+                        <a href="{{ url_for('nextpage') }}">My Tasks</a>
                     </li>
-                {% endfor %}
-            </ul>
-            <button class="task-button" onclick="window.location.href='{{ url_for('task') }}';">Task Input</button>
-            <button class="task-button" onclick="window.location.href='{{ url_for('completed_tasks') }}';">View Completed Tasks</button>
+                    <li id="Completed_Tasks">
+                        <a href="{{ url_for('completed_tasks') }}">Completed</a>
+                    </li>
+                    <li id="Add_Tasks">
+                        <a href="{{ url_for('task') }}">Add Tasks</a>
+                    </li>
+                    <li id="Logout">
+                        <a href="{{ url_for('home') }}">Logout</a>
+                    </li>
+                </ul>
+            </nav>
         </div>
-        <div class="task-details" id="task-details">
-            <h2>Task Details</h2>
-            <p><strong>Task:</strong> <span id="details-task"></span></p>
-            <p><strong>Start Date:</strong> <span id="details-start-date"></span></p>
-            <p><strong>Start Time:</strong> <span id="details-start-time"></span></p>
-            <p><strong>End Date:</strong> <span id="details-end-date"></span></p>
-            <p><strong>End Time:</strong> <span id="details-end-time"></span></p>
-            <!--<p><strong>Assigned To:</strong> <span id="details-dedicated-to"></span></p>-->
-            <p><strong>Description:</strong> <span id="details-description"></span></p>
+    </header>
+    <main>
+        <div class="task-container">
+            <h1>Hello, {{ first_name }}</h1>
+            <div class="section">
+                <h3>Your Tasks</h3>
+                <ul id="tasks-list">
+                    {% for task in tasks %}
+                        <li class="task-item"
+                            data-task="{{ task['task'] }}"
+                            data-start-date="{{ task['dateOfTaskStart'] }}"
+                            data-start-time="{{ task['timeOfTaskStart'] }}"
+                            data-end-date="{{ task['dateOfTaskEnd'] }}"
+                            data-end-time="{{ task['timeOfTaskEnd'] }}"
+                            data-dedicated-to="{{ task['dedicatedTo'] }}"
+                            data-description="{{ task['descript'] }}">
+                            <input type="checkbox" id="task{{ task['TID'] }}" name="task{{ task['TID'] }}" value="{{ task['TID'] }}" {% if task['completed'] %} checked {% endif %} onclick="completeTask({{ task['TID'] }})">
+                            <label for="task{{ task['TID'] }}">{{ task['task'] }}</label>
+                            <button class="delete-button" onclick="deleteTask({{ task['TID'] }})">✖</button>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="task-details" id="task-details">
+                <h2>Task Details</h2>
+                <p><strong>Task:</strong> <span id="details-task"></span></p>
+                <p><strong>Start Date:</strong> <span id="details-start-date"></span></p>
+                <p><strong>Start Time:</strong> <span id="details-start-time"></span></p>
+                <p><strong>End Date:</strong> <span id="details-end-date"></span></p>
+                <p><strong>End Time:</strong> <span id="details-end-time"></span></p>
+                <!--<p><strong>Assigned To:</strong> <span id="details-dedicated-to"></span></p>-->
+                <p><strong>Description:</strong> <span id="details-description"></span></p>
+            </div>
         </div>
-    </div>
+    </main>
 </body>
 </html>

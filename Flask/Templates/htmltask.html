@@ -4,13 +4,8 @@
     <meta charset="utf-8">
     <title>Task Form</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='Images/favicon.ico') }}">
+    <link rel ="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
         h1 {
             text-align: center;
             color: #333;
@@ -90,7 +85,31 @@
     </style>
 </head>
 <body>
-    
+    <header>
+        <div class="container">
+            <div id="brand">
+                <h1>
+                    Taskify!
+                </h1>
+            </div>
+            <nav>
+                <ul>
+                    <li id="Dashboard">
+                        <a href="{{ url_for('nextpage') }}">My Tasks</a>
+                    </li>
+                    <li id="Completed_Tasks">
+                        <a href="{{ url_for('completed_tasks') }}">Completed</a>
+                    </li>
+                    <li id="Add_Tasks" class="current">
+                        <a href="{{ url_for('task') }}">Add Tasks</a>
+                    </li>
+                    <li id="Logout">
+                        <a href="{{ url_for('home') }}">Logout</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
     <h1>Task Form</h1>
     <form method="POST" action="/submit_task">
         <div class="form-group form-group-full">
