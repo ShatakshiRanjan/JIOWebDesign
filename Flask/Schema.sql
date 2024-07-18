@@ -2,6 +2,8 @@ CREATE DATABASE  IF NOT EXISTS `Taskify`;
 USE `Taskify`;
 
 #Drop tables if they exist (optional)
+DROP TABLE IF EXISTS comments;
+DROP TABLE IF EXISTS posts;
 DROP TABLE IF EXISTS task_assignments;
 DROP TABLE IF EXISTS tasks;
 DROP TABLE IF EXISTS users;
