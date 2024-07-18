@@ -145,19 +145,28 @@ def delete_task():
     if not user_id:
         return jsonify(success=False, message="User not logged in"), 401
 
-    task_id = request.json.get('task_id')  # Assuming you're sending JSON data
+    task_id = request.json.get('task_id')
     if not task_id:
         return jsonify(success=False, message="Task ID not provided"), 400
 
     try:
         cursor = mysql.connection.cursor()
+        
+        # Delete records from task_assignments table
+        cursor.execute("DELETE FROM task_assignments WHERE task_id = %s", (task_id,))
+        
+        # Delete the task itself
         cursor.execute("DELETE FROM tasks WHERE TID = %s", (task_id,))
+        
         mysql.connection.commit()
         cursor.close()
+        
         return jsonify(success=True)
     except Exception as e:
+        mysql.connection.rollback()
         print(f"Error deleting task: {e}")
         return jsonify(success=False, message="Database error"), 500
+
 
 @app.route('/task')
 def task():
