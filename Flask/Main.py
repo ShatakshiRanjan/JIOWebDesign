@@ -252,6 +252,61 @@ def mark_incomplete():
 
     return jsonify({'success': True}), 200
 
+@app.route('/discussion_board')
+def discussion_board():
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute("""
+        SELECT posts.id, posts.title, posts.body, posts.created_at, users.first_name, users.last_name 
+        FROM posts
+        JOIN users ON posts.user_id = users.id
+        ORDER BY posts.created_at DESC
+    """)
+    posts = cursor.fetchall()
+    cursor.close()
+    return render_template('CommunityChat.html', posts=posts)
+
+@app.route('/new_post', methods=['GET', 'POST'])
+def new_post():
+    if request.method == 'POST':
+        title = request.form.get('title')
+        body = request.form.get('body')
+        user_id = session.get('user_id')
+
+        cursor = mysql.connection.cursor()
+        cursor.execute("INSERT INTO posts (user_id, title, body) VALUES (%s, %s, %s)", (user_id, title, body))
+        mysql.connection.commit()
+        cursor.close()
+        return redirect(url_for('discussion_board'))
+    return render_template('newPost.html')
+
+@app.route('/post/<int:post_id>', methods=['GET', 'POST'])
+def post(post_id):
+    if request.method == 'POST':
+        body = request.form.get('body')
+        user_id = session.get('user_id')
+
+        cursor = mysql.connection.cursor()
+        cursor.execute("INSERT INTO comments (post_id, user_id, body) VALUES (%s, %s, %s)", (post_id, user_id, body))
+        mysql.connection.commit()
+        cursor.close()
+
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute("SELECT * FROM posts WHERE id = %s", (post_id,))
+    post = cursor.fetchone()
+
+    cursor.execute("""
+        SELECT comments.body, comments.created_at, users.first_name, users.last_name 
+        FROM comments 
+        JOIN users ON comments.user_id = users.id 
+        WHERE comments.post_id = %s
+        ORDER BY comments.created_at ASC
+    """, (post_id,))
+    comments = cursor.fetchall()
+    cursor.close()
+    
+    return render_template('Post.html', post=post, comments=comments)
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)
 

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ post.title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='Chat.css') }}">
+</head>
+<body>
+    <h1>{{ post.title }}</h1>
+    <p>{{ post.body }}</p>
+    <small>By {{ post.first_name }} {{ post.last_name }} on {{ post.created_at }}</small>
+
+    <h2>Comments</h2>
+    <form method="POST">
+        <textarea name="body" placeholder="Write your comment here..." required></textarea><br>
+        <button type="submit">Submit</button>
+    </form>
+
+    <div id="comments">
+        {% for comment in comments %}
+        <div class="comment">
+            <p>{{ comment.body }}</p>
+            <small>By {{ comment.first_name }} {{ comment.last_name }} on {{ comment.created_at }}</small>
+        </div>
+        {% endfor %}
+    </div>
+    <a href="{{ url_for('discussion_board') }}">Back to Discussion Board</a>
+</body>
+</html>
