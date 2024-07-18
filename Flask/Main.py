@@ -36,7 +36,7 @@ scheduler = BackgroundScheduler()
 
 def remove_old_completed_tasks():
     cursor = mysql.connection.cursor()
-    cursor.execute("DELETE FROM tasks WHERE completed = TRUE AND completion_date < NOW() - INTERVAL 30 DAY")
+    cursor.execute("DELETE FROM tasks WHERE completed = TRUE AND completion_date < NOW() - INTERVAL 1 DAY")
     mysql.connection.commit()
     cursor.close()
 
