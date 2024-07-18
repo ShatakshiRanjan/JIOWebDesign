@@ -66,7 +66,9 @@
             <!--<p><strong>Assigned To:</strong> <span id="details-dedicated-to"></span></p>-->
             <p><strong>Description:</strong> <span id="details-description"></span></p>
         </div>
-        <button class="task-button" onclick="window.location.href='{{ url_for('nextpage') }}';">Dashboard</button>
+        <a href="{{ url_for('discussion_board') }}" id="fixed-round-button">
+            <img src="{{ url_for('static', filename='images/chat.png') }}" alt="Button Image">
+        </a>
     </div>
 </body>
 </html>

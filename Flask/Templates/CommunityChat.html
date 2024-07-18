@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Discussion Board</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='Chat.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='idex.css') }}">
 </head>
 <body>
     <h1>Discussion Board</h1>
@@ -17,5 +18,8 @@
         </div>
         {% endfor %}
     </div>
+    <a href="{{ url_for('nextpage') }}" id="fixed-round-button">
+        <img src="{{ url_for('static', filename='images/to-do.png') }}" alt="Button Image">
+    </a>
 </body>
 </html>
