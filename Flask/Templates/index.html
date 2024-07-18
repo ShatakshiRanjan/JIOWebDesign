@@ -8,6 +8,13 @@
     <link rel ="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='Images/favicon.ico') }}">
     <script src="{{ url_for('static', filename='background-script.js') }}" defer></script>
+    <style>
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100vh;
+        }
+    </style>
 </head>
 <body>
     <div class="stars" id="stars"></div>
