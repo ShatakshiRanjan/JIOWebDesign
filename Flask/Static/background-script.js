@@ -4,9 +4,9 @@ document.addEventListener("DOMContentLoaded", function() {
     
     var height = document.documentElement.scrollHeight;
     
-    const starsmall = height/8;
-    const starmid = height/10;
-    const starbig = height/15;
+    const starsmall = height/12;
+    const starmid = height/15;
+    const starbig = height/18;
   
     for (let i = 0; i < starsmall; i++) {
       let star = document.createElement('div');

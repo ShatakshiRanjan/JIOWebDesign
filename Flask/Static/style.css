@@ -28,7 +28,7 @@ ul{
     flex-direction: column;
     min-height: 100vh;
     position: relative;
-    overflow: hidden;
+    overflow-x: hidden;
     width: 100%;
 }
 
@@ -38,7 +38,7 @@ ul{
     height: 100%;
     width: 100%;
     /* background: url('Images/20536905.jpg') center center/cover no-repeat; */
-    background-image: radial-gradient( #0c0570 0%,#0a045a 25%,#10034f 55%, #010235 75%, #000000 100% );
+    background-image: radial-gradient( #0c0570 0%,#0a045a 25%,#10034f 45%, #010235 70%, #000000 100% );
     z-index: -1;
     /* animation:  15s ease-in-out infinite alternate; */
 }

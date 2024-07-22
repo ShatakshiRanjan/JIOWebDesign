@@ -82,6 +82,11 @@
         .dropdown-checkbox:hover .dropdown-checkbox-content {
             display: block;
         }
+        .error-message {
+            color: red;
+            display: none;
+        }
+
     </style>
 </head>
 <body>
@@ -111,7 +116,7 @@
         </div>
     </header>
     <h1>Task Form</h1>
-    <form method="POST" action="/submit_task">
+    <form id="taskForm" method="POST" action="/submit_task">
         <div class="form-group form-group-full">
             <label for="task">Task:</label>
             <input type="text" id="task" name="task">
@@ -159,6 +164,8 @@
             <textarea id="descript" name="descript"></textarea>
         </div>
 
+        <div class="error-message" id="errorMessage">End date and time must be after start date and time.</div>
+
         <input type="submit" value="Submit">
     </form>
 
@@ -171,6 +178,27 @@
                 dropdown.style.display = 'none';
             }
         });
+
+        document.getElementById('taskForm').addEventListener('submit', function(event) {
+            var startDate = document.getElementById('dateOfTaskStart').value;
+            var startTime = document.getElementById('timeOfTaskStart').value;
+            var endDate = document.getElementById('dateOfTaskEnd').value;
+            var endTime = document.getElementById('timeOfTaskEnd').value;
+
+            var startDateTime = new Date(startDate + 'T' + startTime);
+            var endDateTime = new Date(endDate + 'T' + endTime);
+
+            console.log(startDateTime);
+            console.log(endDateTime);
+
+            if (startDateTime >= endDateTime) {
+                event.preventDefault();
+                document.getElementById('errorMessage').style.display = 'block';
+            } else {
+                document.getElementById('errorMessage').style.display = 'none';
+            }
+        });
+
     </script>
 </body>
 </html>

@@ -311,5 +311,9 @@ def post(post_id):
     
     return render_template('Post.html', post=post, comments=comments)
 
+@app.route('/calendar')
+def calendar():
+    return render_template('calendar.html')
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)
