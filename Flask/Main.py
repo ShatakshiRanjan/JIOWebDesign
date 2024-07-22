@@ -291,7 +291,12 @@ def post(post_id):
         cursor.close()
 
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cursor.execute("SELECT * FROM posts WHERE id = %s", (post_id,))
+    cursor.execute("""
+        SELECT posts.*, users.first_name, users.last_name 
+        FROM posts 
+        JOIN users ON posts.user_id = users.id 
+        WHERE posts.id = %s
+    """, (post_id,))
     post = cursor.fetchone()
 
     cursor.execute("""
@@ -305,7 +310,6 @@ def post(post_id):
     cursor.close()
     
     return render_template('Post.html', post=post, comments=comments)
-
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)

@@ -5,11 +5,14 @@
     <title>{{ post.title }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='Chat.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='idex.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='Images/favicon.ico') }}">
 </head>
 <body>
-    <h1>{{ post.title }}</h1>
-    <p>{{ post.body }}</p>
-    <small>By {{ post.first_name }} {{ post.last_name }} on {{ post.created_at }}</small>
+    <div id="posts">
+        <h1>{{ post.title }}</h1>
+        <p>{{ post.body }}</p>
+        <small>By {{ post.first_name }} {{ post.last_name }} on {{ post.created_at }}</small>
+    </div>
 
     <h2>Comments</h2>
     <form method="POST">
