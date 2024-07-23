@@ -252,6 +252,34 @@ def mark_incomplete():
 
     return jsonify({'success': True}), 200
 
+@app.route('/delete_post', methods=['POST'])
+def delete_post():
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify(success=False, message="User not logged in"), 401
+
+    post_id = request.json.get('post_id')
+    if not post_id:
+        return jsonify(success=False, message="Post ID not provided"), 400
+
+    try:
+        cursor = mysql.connection.cursor()
+        
+        # Delete comments associated with the post
+        cursor.execute("DELETE FROM comments WHERE post_id = %s", (post_id,))
+        
+        # Delete the post itself
+        cursor.execute("DELETE FROM posts WHERE id = %s", (post_id,))
+        
+        mysql.connection.commit()
+        cursor.close()
+        
+        return jsonify(success=True)
+    except Exception as e:
+        mysql.connection.rollback()
+        print(f"Error deleting post: {e}")
+        return jsonify(success=False, message="Database error"), 500
+
 @app.route('/discussion_board')
 def discussion_board():
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)

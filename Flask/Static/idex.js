@@ -113,3 +113,43 @@ window.onload = function() {
         sessionStorage.removeItem('reloaded');
     }
 };
+
+function deletePost(postId) {
+    fetch('/delete_post', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ post_id: postId }),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            console.error('Post deletion failed:', data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error deleting post:', error);
+    });
+}
+
+document.querySelectorAll('.delete-button').forEach(button => {
+    button.addEventListener('click', event => {
+        event.stopPropagation(); // Prevent triggering other click events
+        const postId = event.currentTarget.dataset.postId;
+        deletePost(postId);
+    });
+});
+
+function confirmDelete(postId) {
+    if (confirm('Are you sure you want to delete this post?')) {
+        deletePost(postId);
+    }
+}
