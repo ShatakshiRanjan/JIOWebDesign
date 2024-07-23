@@ -211,7 +211,7 @@ def complete_task():
     if not user_id:
         return redirect(url_for('login'))
 
-    task_id = request.json.get('task_id')  # Assuming you're sending JSON data
+    task_id = request.json.get('task_id')  
     cursor = mysql.connection.cursor()
     cursor.execute("UPDATE tasks SET completed = TRUE, completion_date = NOW() WHERE TID = %s", (task_id,))
     mysql.connection.commit()
