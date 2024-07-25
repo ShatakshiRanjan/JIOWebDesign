@@ -123,13 +123,16 @@ def nextpage():
             user = cursor.fetchone()
             first_name = user['first_name'] if user else None
 
-            # Fetch tasks for the user using the task_assignments table
+            # Fetch tasks and assigned users for the user
             cursor.execute("""
-                SELECT tasks.TID, tasks.task, tasks.dateOfTaskStart, tasks.timeOfTaskStart, tasks.dateOfTaskEnd, tasks.timeOfTaskEnd, tasks.descript 
-                FROM tasks 
+                SELECT tasks.TID, tasks.task, tasks.dateOfTaskStart, tasks.timeOfTaskStart, tasks.dateOfTaskEnd, tasks.timeOfTaskEnd, tasks.descript,
+                       GROUP_CONCAT(CONCAT(users.first_name, ' ', users.last_name) SEPARATOR ', ') AS assigned_users
+                FROM tasks
                 JOIN task_assignments ON tasks.TID = task_assignments.task_id
-                WHERE task_assignments.user_id = %s AND tasks.completed = FALSE
-            """, (user_id,))
+                JOIN users ON task_assignments.user_id = users.id
+                WHERE tasks.completed = FALSE
+                GROUP BY tasks.TID
+            """)
             tasks = cursor.fetchall()
         
         cursor.close()
@@ -226,17 +229,25 @@ def completed_tasks():
         return redirect(url_for('login'))
 
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    # Fetch completed tasks for the user using the task_assignments table
+
+    # Fetch completed tasks for the user along with all assigned users
     cursor.execute("""
-        SELECT tasks.TID, tasks.task, tasks.dateOfTaskStart, tasks.timeOfTaskStart, tasks.dateOfTaskEnd, tasks.timeOfTaskEnd, tasks.descript 
-        FROM tasks 
+        SELECT tasks.TID, tasks.task, tasks.dateOfTaskStart, tasks.timeOfTaskStart, tasks.dateOfTaskEnd, tasks.timeOfTaskEnd, tasks.descript,
+               GROUP_CONCAT(CONCAT(users.first_name, ' ', users.last_name) SEPARATOR ', ') AS assigned_users
+        FROM tasks
         JOIN task_assignments ON tasks.TID = task_assignments.task_id
-        WHERE task_assignments.user_id = %s AND tasks.completed = TRUE
+        JOIN users ON task_assignments.user_id = users.id
+        WHERE tasks.completed = TRUE AND tasks.TID IN (
+            SELECT task_id FROM task_assignments WHERE user_id = %s
+        )
+        GROUP BY tasks.TID
     """, (user_id,))
     tasks = cursor.fetchall()
     cursor.close()
     
     return render_template('completed_tasks.html', tasks=tasks)
+
+
 
 @app.route('/mark_incomplete', methods=['POST'])
 def mark_incomplete():

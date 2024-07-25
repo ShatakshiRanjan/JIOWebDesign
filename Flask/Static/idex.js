@@ -6,10 +6,11 @@ document.querySelectorAll('.task-item').forEach(item => {
         document.getElementById('details-start-time').textContent = taskDetails.startTime;
         document.getElementById('details-end-date').textContent = taskDetails.endDate;
         document.getElementById('details-end-time').textContent = taskDetails.endTime;
-        //document.getElementById('details-dedicated-to').textContent = taskDetails.dedicatedTo;
+        document.getElementById('details-dedicated-to').textContent = taskDetails.dedicatedTo;
         document.getElementById('details-description').textContent = taskDetails.description;
     });
 });
+
 
 function completeTask(taskId) {
     fetch('/complete_task', {
@@ -99,7 +100,7 @@ function deleteTask(taskId) {
 
 document.querySelectorAll('.delete-button').forEach(button => {
     button.addEventListener('click', event => {
-        event.stopPropagation(); // Prevent triggering other click events
+        event.stopPropagation();
         const taskId = event.currentTarget.parentElement.querySelector('input[type="checkbox"]').value;
         deleteTask(taskId);
     });
@@ -113,6 +114,7 @@ window.onload = function() {
         sessionStorage.removeItem('reloaded');
     }
 };
+
 
 function deletePost(postId) {
     fetch('/delete_post', {
