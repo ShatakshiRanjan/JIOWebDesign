@@ -11,7 +11,6 @@ document.querySelectorAll('.task-item').forEach(item => {
     });
 });
 
-
 function completeTask(taskId) {
     fetch('/complete_task', {
         method: 'POST',
@@ -28,7 +27,7 @@ function completeTask(taskId) {
     })
     .then(data => {
         if (data.success) {
-            location.reload(); 
+            location.reload();
         } else {
             console.error('Task completion failed:', data.message);
         }
@@ -37,14 +36,6 @@ function completeTask(taskId) {
         console.error('Error completing task:', error);
     });
 }
-
-document.querySelectorAll('input[type="checkbox"]').forEach(item => {
-    item.addEventListener('change', event => {
-        if (!event.target.checked) {
-            markIncomplete(event.target.value);
-        }
-    });
-});
 
 function markIncomplete(taskId) {
     fetch('/mark_incomplete', {
@@ -71,6 +62,16 @@ function markIncomplete(taskId) {
         console.error('Error marking task incomplete:', error);
     });
 }
+
+document.querySelectorAll('input[type="checkbox"]').forEach(item => {
+    item.addEventListener('change', event => {
+        if (event.target.checked) {
+            completeTask(event.target.value);
+        } else {
+            markIncomplete(event.target.value);
+        }
+    });
+});
 
 function deleteTask(taskId) {
     fetch('/delete_task', {
@@ -115,7 +116,6 @@ window.onload = function() {
     }
 };
 
-
 function deletePost(postId) {
     fetch('/delete_post', {
         method: 'POST',
@@ -144,9 +144,9 @@ function deletePost(postId) {
 
 document.querySelectorAll('.delete-button').forEach(button => {
     button.addEventListener('click', event => {
-        event.stopPropagation(); // Prevent triggering other click events
+        event.stopPropagation();
         const postId = event.currentTarget.dataset.postId;
-        deletePost(postId);
+        confirmDelete(postId);
     });
 });
 

@@ -111,34 +111,41 @@ def home():
 @app.route('/dashboard')
 def nextpage():
     user_id = session.get("user_id")
-    if user_id:
-        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        
-        # Fetch user first name
-        if user_id == "admin":
-            first_name = "admin"
-            tasks = []
-        else:
-            cursor.execute("SELECT first_name FROM users WHERE id = %s", (user_id,))
-            user = cursor.fetchone()
-            first_name = user['first_name'] if user else None
+    if not user_id:
+        return redirect(url_for('login'))
 
-            # Fetch tasks and assigned users for the user
-            cursor.execute("""
-                SELECT tasks.TID, tasks.task, tasks.dateOfTaskStart, tasks.timeOfTaskStart, tasks.dateOfTaskEnd, tasks.timeOfTaskEnd, tasks.descript,
-                       GROUP_CONCAT(CONCAT(users.first_name, ' ', users.last_name) SEPARATOR ', ') AS assigned_users
-                FROM tasks
-                JOIN task_assignments ON tasks.TID = task_assignments.task_id
-                JOIN users ON task_assignments.user_id = users.id
-                WHERE tasks.completed = FALSE
-                GROUP BY tasks.TID
-            """)
-            tasks = cursor.fetchall()
-        
-        cursor.close()
-        
-        if first_name:
-            return render_template('dashboard.html', first_name=first_name, tasks=tasks)
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    
+    # Fetch user first name
+    if user_id == "admin":
+        first_name = "admin"
+        tasks = []
+    else:
+        cursor.execute("SELECT first_name FROM users WHERE id = %s", (user_id,))
+        user = cursor.fetchone()
+        first_name = user['first_name'] if user else None
+
+        # Fetch tasks assigned to the user and include all assigned users for each task
+        cursor.execute("""
+            SELECT tasks.TID, tasks.task, tasks.dateOfTaskStart, tasks.timeOfTaskStart, tasks.dateOfTaskEnd, tasks.timeOfTaskEnd, tasks.descript,
+                   GROUP_CONCAT(CONCAT(users.first_name, ' ', users.last_name) SEPARATOR ', ') AS assigned_users
+            FROM tasks
+            JOIN task_assignments ON tasks.TID = task_assignments.task_id
+            JOIN users ON task_assignments.user_id = users.id
+            WHERE tasks.completed = FALSE AND tasks.TID IN (
+                SELECT task_id FROM task_assignments WHERE user_id = %s
+            )
+            GROUP BY tasks.TID
+        """, (user_id,))
+        tasks = cursor.fetchall()
+    
+    cursor.close()
+    
+    if first_name:
+        return render_template('dashboard.html', first_name=first_name, tasks=tasks)
+    
+    return redirect(url_for('login'))
+
     
     return redirect(url_for('login'))
 
@@ -246,8 +253,6 @@ def completed_tasks():
     cursor.close()
     
     return render_template('completed_tasks.html', tasks=tasks)
-
-
 
 @app.route('/mark_incomplete', methods=['POST'])
 def mark_incomplete():
