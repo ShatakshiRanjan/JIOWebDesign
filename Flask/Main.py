@@ -95,7 +95,6 @@ def login():
 
         # Compare the provided password with the password stored in the database
         if user['passw'] == hashed_password:
-            # Store user information in the session
             session["user_id"] = user['id']
             return redirect(url_for("nextpage"))
         else:
@@ -116,7 +115,7 @@ def nextpage():
 
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     
-    # Fetch user first name
+    # Hard bypass for admin
     if user_id == "admin":
         first_name = "admin"
         tasks = []
@@ -143,9 +142,6 @@ def nextpage():
     
     if first_name:
         return render_template('dashboard.html', first_name=first_name, tasks=tasks)
-    
-    return redirect(url_for('login'))
-
     
     return redirect(url_for('login'))
 
@@ -239,7 +235,7 @@ def completed_tasks():
 
     # Fetch completed tasks for the user along with all assigned users
     cursor.execute("""
-        SELECT tasks.TID, tasks.task, tasks.dateOfTaskStart, tasks.timeOfTaskStart, tasks.dateOfTaskEnd, tasks.timeOfTaskEnd, tasks.descript,
+        SELECT tasks.TID, tasks.task, tasks.dateOfTaskStart, tasks.timeOfTaskStart, tasks.dateOfTaskEnd, tasks.timeOfTaskEnd, tasks.descript, tasks.completion_date,
                GROUP_CONCAT(CONCAT(users.first_name, ' ', users.last_name) SEPARATOR ', ') AS assigned_users
         FROM tasks
         JOIN task_assignments ON tasks.TID = task_assignments.task_id

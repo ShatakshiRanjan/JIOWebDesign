@@ -48,7 +48,8 @@
                         data-end-date="{{ task['dateOfTaskEnd'] }}"
                         data-end-time="{{ task['timeOfTaskEnd'] }}"
                         data-dedicated-to="{{ task['assigned_users'] }}"
-                        data-description="{{ task['descript'] }}">
+                        data-description="{{ task['descript'] }}"
+                        data-completion-date="{{ task['completion_date'] }}">
                         <input type="checkbox" id="task{{ task['TID'] }}" name="task{{ task['TID'] }}" value="{{ task['TID'] }}" checked>
                         <label for="task{{ task['TID'] }}">{{ task['task'] }}</label>
                         <button class="delete-button" onclick="deleteTask({{ task['TID'] }})">✖</button>
@@ -63,6 +64,7 @@
             <p><strong>Start Time:</strong> <span id="details-start-time"></span></p>
             <p><strong>End Date:</strong> <span id="details-end-date"></span></p>
             <p><strong>End Time:</strong> <span id="details-end-time"></span></p>
+            <p><strong>Completion:</strong> <span id="details-completion-date"></span></p>
             <p><strong>Assigned To:</strong> <span id="details-dedicated-to"></span></p>
             <p><strong>Description:</strong> <span id="details-description"></span></p>
         </div>

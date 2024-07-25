@@ -1,13 +1,33 @@
 document.querySelectorAll('.task-item').forEach(item => {
     item.addEventListener('mouseover', event => {
         const taskDetails = event.currentTarget.dataset;
+
+        const formatDate = (dateString) => {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            const date = new Date(dateString);
+            return date.toLocaleDateString(undefined, options);
+        };
+
+        const formatTime = (timeString) => {
+            const [hours, minutes] = timeString.split(':').map(Number);
+            const date = new Date();
+            date.setHours(hours, minutes);
+            return date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', hour12: false });
+        };
+
+        const formatDateTime = (dateTimeString) => {
+            const [date, time] = dateTimeString.split(' ');
+            return `${formatDate(date)} at ${formatTime(time)}`;
+        };
+
         document.getElementById('details-task').textContent = taskDetails.task;
-        document.getElementById('details-start-date').textContent = taskDetails.startDate;
-        document.getElementById('details-start-time').textContent = taskDetails.startTime;
-        document.getElementById('details-end-date').textContent = taskDetails.endDate;
-        document.getElementById('details-end-time').textContent = taskDetails.endTime;
+        document.getElementById('details-start-date').textContent = formatDate(taskDetails.startDate);
+        document.getElementById('details-start-time').textContent = formatTime(taskDetails.startTime);
+        document.getElementById('details-end-date').textContent = formatDate(taskDetails.endDate);
+        document.getElementById('details-end-time').textContent = formatTime(taskDetails.endTime);
         document.getElementById('details-dedicated-to').textContent = taskDetails.dedicatedTo;
         document.getElementById('details-description').textContent = taskDetails.description;
+        document.getElementById('details-completion-date').textContent = formatDateTime(taskDetails.completionDate);
     });
 });
 
