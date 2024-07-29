@@ -6,6 +6,8 @@
     <link rel ="stylesheet" href="{{ url_for('static', filename='idex.css') }}">
     <link rel ="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="{{ url_for('static', filename='idex.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='moment.min.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='calendar.js') }}" defer></script>
     <title>Dashboard</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='Images/favicon.ico') }}">
 </head>
@@ -38,6 +40,9 @@
     <main>
         <div class="task-container">
             <h1>Hello {{ first_name }}!</h1>
+            <div id="calendar_sec">
+                <div id="calendar"></div>
+            </div>
             <div class="section">
                 <h3>Your Tasks</h3>
                 <ul id="tasks-list">

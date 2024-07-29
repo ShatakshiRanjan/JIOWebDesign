@@ -175,11 +175,31 @@
       }
       return classes.join(' ');
     }
-  
+    var curDay = 0;
     Calendar.prototype.openDay = function(el) {
       var details, arrow;
       var dayNumber = +el.querySelectorAll('.day-number')[0].innerText || +el.querySelectorAll('.day-number')[0].textContent;
       var day = this.current.clone().date(dayNumber);
+      if(curDay == dayNumber){
+        //Closing the details of the same day
+        var currentOpened = document.querySelector('.details');
+        currentOpened.addEventListener('webkitAnimationEnd', function() {
+          currentOpened.parentNode.removeChild(currentOpened);
+        });
+        currentOpened.addEventListener('oanimationend', function() {
+          currentOpened.parentNode.removeChild(currentOpened);
+        });
+        currentOpened.addEventListener('msAnimationEnd', function() {
+          currentOpened.parentNode.removeChild(currentOpened);
+        });
+        currentOpened.addEventListener('animationend', function() {
+          currentOpened.parentNode.removeChild(currentOpened);
+        });
+        currentOpened.className = 'details out';
+        curDay = 0;
+        return;
+      }
+      curDay = dayNumber;
   
       var currentOpened = document.querySelector('.details');
   
@@ -227,7 +247,8 @@
   
       this.renderEvents(todaysEvents, details);
   
-      arrow.style.left = el.offsetLeft - el.parentNode.offsetLeft + 27 + 'px';
+      arrow.style.left = el.offsetLeft - el.parentNode.offsetLeft + 38 + 'px';
+      // details.style.left = el.offsetLeft - el.parentNode.offsetLeft - 10 + 'px';
     }
   
     Calendar.prototype.renderEvents = function(events, ele) {
