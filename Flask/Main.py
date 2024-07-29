@@ -95,7 +95,6 @@ def login():
 
         # Compare the provided password with the password stored in the database
         if user['passw'] == hashed_password:
-            # Store user information in the session
             session["user_id"] = user['id']
             return redirect(url_for("nextpage"))
         else:
@@ -111,31 +110,38 @@ def home():
 @app.route('/dashboard')
 def nextpage():
     user_id = session.get("user_id")
-    if user_id:
-        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        
-        # Fetch user first name
-        if user_id == "admin":
-            first_name = "admin"
-            tasks = []
-        else:
-            cursor.execute("SELECT first_name FROM users WHERE id = %s", (user_id,))
-            user = cursor.fetchone()
-            first_name = user['first_name'] if user else None
+    if not user_id:
+        return redirect(url_for('login'))
 
-            # Fetch tasks for the user using the task_assignments table
-            cursor.execute("""
-                SELECT tasks.TID, tasks.task, tasks.dateOfTaskStart, tasks.timeOfTaskStart, tasks.dateOfTaskEnd, tasks.timeOfTaskEnd, tasks.descript 
-                FROM tasks 
-                JOIN task_assignments ON tasks.TID = task_assignments.task_id
-                WHERE task_assignments.user_id = %s AND tasks.completed = FALSE
-            """, (user_id,))
-            tasks = cursor.fetchall()
-        
-        cursor.close()
-        
-        if first_name:
-            return render_template('dashboard.html', first_name=first_name, tasks=tasks)
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    
+    # Hard bypass for admin
+    if user_id == "admin":
+        first_name = "admin"
+        tasks = []
+    else:
+        cursor.execute("SELECT first_name FROM users WHERE id = %s", (user_id,))
+        user = cursor.fetchone()
+        first_name = user['first_name'] if user else None
+
+        # Fetch tasks assigned to the user and include all assigned users for each task
+        cursor.execute("""
+            SELECT tasks.TID, tasks.task, tasks.dateOfTaskStart, tasks.timeOfTaskStart, tasks.dateOfTaskEnd, tasks.timeOfTaskEnd, tasks.descript,
+                   GROUP_CONCAT(CONCAT(users.first_name, ' ', users.last_name) SEPARATOR ', ') AS assigned_users
+            FROM tasks
+            JOIN task_assignments ON tasks.TID = task_assignments.task_id
+            JOIN users ON task_assignments.user_id = users.id
+            WHERE tasks.completed = FALSE AND tasks.TID IN (
+                SELECT task_id FROM task_assignments WHERE user_id = %s
+            )
+            GROUP BY tasks.TID
+        """, (user_id,))
+        tasks = cursor.fetchall()
+    
+    cursor.close()
+    
+    if first_name:
+        return render_template('dashboard.html', first_name=first_name, tasks=tasks)
     
     return redirect(url_for('login'))
 
@@ -211,7 +217,7 @@ def complete_task():
     if not user_id:
         return redirect(url_for('login'))
 
-    task_id = request.json.get('task_id')  # Assuming you're sending JSON data
+    task_id = request.json.get('task_id')  
     cursor = mysql.connection.cursor()
     cursor.execute("UPDATE tasks SET completed = TRUE, completion_date = NOW() WHERE TID = %s", (task_id,))
     mysql.connection.commit()
@@ -226,12 +232,18 @@ def completed_tasks():
         return redirect(url_for('login'))
 
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    # Fetch completed tasks for the user using the task_assignments table
+
+    # Fetch completed tasks for the user along with all assigned users
     cursor.execute("""
-        SELECT tasks.TID, tasks.task, tasks.dateOfTaskStart, tasks.timeOfTaskStart, tasks.dateOfTaskEnd, tasks.timeOfTaskEnd, tasks.descript 
-        FROM tasks 
+        SELECT tasks.TID, tasks.task, tasks.dateOfTaskStart, tasks.timeOfTaskStart, tasks.dateOfTaskEnd, tasks.timeOfTaskEnd, tasks.descript, tasks.completion_date,
+               GROUP_CONCAT(CONCAT(users.first_name, ' ', users.last_name) SEPARATOR ', ') AS assigned_users
+        FROM tasks
         JOIN task_assignments ON tasks.TID = task_assignments.task_id
-        WHERE task_assignments.user_id = %s AND tasks.completed = TRUE
+        JOIN users ON task_assignments.user_id = users.id
+        WHERE tasks.completed = TRUE AND tasks.TID IN (
+            SELECT task_id FROM task_assignments WHERE user_id = %s
+        )
+        GROUP BY tasks.TID
     """, (user_id,))
     tasks = cursor.fetchall()
     cursor.close()
@@ -251,6 +263,34 @@ def mark_incomplete():
     cursor.close()
 
     return jsonify({'success': True}), 200
+
+@app.route('/delete_post', methods=['POST'])
+def delete_post():
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify(success=False, message="User not logged in"), 401
+
+    post_id = request.json.get('post_id')
+    if not post_id:
+        return jsonify(success=False, message="Post ID not provided"), 400
+
+    try:
+        cursor = mysql.connection.cursor()
+        
+        # Delete comments associated with the post
+        cursor.execute("DELETE FROM comments WHERE post_id = %s", (post_id,))
+        
+        # Delete the post itself
+        cursor.execute("DELETE FROM posts WHERE id = %s", (post_id,))
+        
+        mysql.connection.commit()
+        cursor.close()
+        
+        return jsonify(success=True)
+    except Exception as e:
+        mysql.connection.rollback()
+        print(f"Error deleting post: {e}")
+        return jsonify(success=False, message="Database error"), 500
 
 @app.route('/discussion_board')
 def discussion_board():
@@ -316,4 +356,4 @@ def calendar():
     return render_template('calendar.html')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000, debug=True)
+    app.run(host='127.0.0.1', port=8000, debug=True)

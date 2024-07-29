@@ -17,7 +17,7 @@
     <h2>Comments</h2>
     <form method="POST">
         <textarea name="body" placeholder="Write your comment here..." required></textarea><br>
-        <button type="submit">Submit</button>
+        <button class=sub-button type="submit">Submit</button>
     </form>
 
     <div id="comments">
@@ -28,7 +28,7 @@
         </div>
         {% endfor %}
     </div>
-    <a href="{{ url_for('discussion_board') }}">Back to Discussion Board</a>
+    <button onclick="window.location.href='{{ url_for('discussion_board') }}';">Back to Discussion Board</button>
     <a href="{{ url_for('nextpage') }}" id="fixed-round-button">
         <img src="{{ url_for('static', filename='images/to-do.png') }}" alt="Button Image">
     </a>

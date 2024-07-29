@@ -15,8 +15,9 @@ h1 {
 }
 
 .post, .comment {
+    position: relative; /* Add this to use absolute positioning for delete button */
     background: #fff;
-    padding: 20px;
+    padding: 1%;
     margin-bottom: 20px;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -27,14 +28,14 @@ form {
 }
 
 input, textarea {
-    width: 100%;
+    width: 97%;
     margin-bottom: 10px;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
 }
 
-button {
+.sub-button {
     padding: 10px;
     border: none;
     border-radius: 4px;
@@ -43,7 +44,7 @@ button {
     cursor: pointer;
 }
 
-button:hover {
+.sub-button:hover {
     background-color: #555;
 }
 
@@ -51,4 +52,59 @@ small {
     display: block;
     margin-top: 10px;
     color: #777;
+}
+
+/* Delete buttons */
+.delete-button {
+    position: absolute; /* Position the delete button absolutely */
+    top: 15%; /* Adjust top position as needed */
+    right: 2%; 
+    background: none;
+    border: none;
+    color: red;
+    font-size: 1.2em;
+    cursor: pointer;
+}
+
+.delete-button:hover {
+    color: darkred;
+}
+
+.new-button {
+    display: inline-block;
+    border-radius: 4px;
+    background-color: #3e10a2;
+    border: none;
+    color: #FFFFFF;
+    text-align: center;
+    padding: 20px;
+    width: 200px;
+    transition: all 0.5s;
+    cursor: pointer;
+    margin-left: 20px;
+}
+
+.new-button span {
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    transition: 0.5s;
+}
+
+.new-button span:after {
+    content: '\00bb';
+    position: absolute;
+    opacity: 0;
+    top: 0;
+    right: -20px;
+    transition: 0.5s;
+}
+
+.new-button:hover span {
+    padding-right: 25px;
+}
+
+.new-button:hover span:after {
+    opacity: 1;
+    right: 0;
 }

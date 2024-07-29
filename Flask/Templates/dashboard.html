@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel ="stylesheet" href="{{ url_for('static', filename='idex.css') }}">
-    <link rel ="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='idex.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="{{ url_for('static', filename='idex.js') }}" defer></script>
     <script src="{{ url_for('static', filename='moment.min.js') }}" defer></script>
     <script src="{{ url_for('static', filename='calendar.js') }}" defer></script>
@@ -15,9 +15,7 @@
     <header>
         <div class="container">
             <div id="brand">
-                <h1>
-                    Taskify!
-                </h1>
+                <h1>Taskify!</h1>
             </div>
             <nav>
                 <ul>
@@ -44,7 +42,7 @@
                 <div id="calendar"></div>
             </div>
             <div class="section">
-                <h3>Your Tasks</h3>
+                <h3>Tasks</h3>
                 <ul id="tasks-list">
                     {% for task in tasks %}
                         <li class="task-item"
@@ -69,13 +67,10 @@
                 <p><strong>Start Time:</strong> <span id="details-start-time"></span></p>
                 <p><strong>End Date:</strong> <span id="details-end-date"></span></p>
                 <p><strong>End Time:</strong> <span id="details-end-time"></span></p>
-                <!--<p><strong>Assigned To:</strong> <span id="details-dedicated-to"></span></p>-->
+                <p><strong>Assigned To:</strong> <span id="details-dedicated-to"></span></p>
                 <p><strong>Description:</strong> <span id="details-description"></span></p>
             </div>
         </div>
-        <a href="{{ url_for('discussion_board') }}" id="fixed-round-button">
-            <img src="{{ url_for('static', filename='images/chat.png') }}" alt="Button Image">
-        </a>
     </main>
 </body>
 </html>

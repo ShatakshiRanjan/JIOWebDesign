@@ -6,16 +6,18 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='Chat.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='idex.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='Images/favicon.ico') }}">
+    <script src="{{ url_for('static', filename='idex.js') }}" defer></script>
 </head>
 <body>
     <h1>Discussion Board</h1>
-    <a href="{{ url_for('new_post') }}">Create New Post</a>
+    <button  class="new-button" onclick="window.location.href='{{ url_for('new_post') }}';"><span>Create New Post</span></button>
     <div id="posts">
         {% for post in posts %}
         <div class="post">
-            <h2><a href="{{ url_for('post', post_id=post.id) }}">{{ post.title }}</a></h2>
+            <h2><a style="text-decoration: none; color: black" href="{{ url_for('post', post_id=post.id) }}">{{ post.title }}</a></h2>
             <p>{{ post.body }}</p>
             <small>By {{ post.first_name }} {{ post.last_name }} on {{ post.created_at }}</small>
+            <button class="delete-button" onclick="confirmDelete({{ post.id }})">✖</button>
         </div>
         {% endfor %}
     </div>

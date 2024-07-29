@@ -12,9 +12,9 @@
     <form method="POST">
         <input type="text" name="title" placeholder="Title" required><br>
         <textarea name="body" placeholder="Write your post here..." required></textarea><br>
-        <button type="submit">Submit</button>
+        <button class=sub-button type="submit">Submit</button>
     </form>
-    <a href="{{ url_for('discussion_board') }}">Back to Discussion Board</a>
+    <button onclick="window.location.href='{{ url_for('discussion_board') }}';">Back to Discussion Board</button>
     <a href="{{ url_for('nextpage') }}" id="fixed-round-button">
         <img src="{{ url_for('static', filename='images/to-do.png') }}" alt="Button Image">
     </a>
