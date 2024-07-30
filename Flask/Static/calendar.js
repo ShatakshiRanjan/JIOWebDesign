@@ -143,13 +143,14 @@
       //Events
       var events = createElement('div', 'day-events');
       this.drawEvents(day, events);
-  
+      
+      
       outer.appendChild(name);
       outer.appendChild(number);
       outer.appendChild(events);
       this.week.appendChild(outer);
     }
-  
+    
     Calendar.prototype.drawEvents = function(day, element) {
       if(day.month() === this.current.month()) {
         var todaysEvents = this.events.reduce(function(memo, ev) {
@@ -158,9 +159,10 @@
           }
           return memo;
         }, []);
-  
+        
         todaysEvents.forEach(function(ev) {
           var evSpan = createElement('span', ev.color);
+          evSpan.setAttribute(`title`, ev.eventName);
           element.appendChild(evSpan);
         });
       }
@@ -258,7 +260,7 @@
   
       events.forEach(function(ev) {
         var div = createElement('div', 'event');
-        var square = createElement('div', 'event-category ' + ev.color);
+        var square = createElement('div', 'event-category ' + ev.color,);
         var span = createElement('span', '', ev.eventName);
   
         div.appendChild(square);
