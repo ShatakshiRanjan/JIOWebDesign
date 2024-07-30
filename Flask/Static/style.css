@@ -174,26 +174,6 @@ main{
     position: relative;
 }
 
-
-@keyframes slidein {
-
-    from {
-        /* background-position: top;background-size:3000px;  */
-        scale:1.2}
-    to {
-        /* background-position: -100px 0px;background-size:2750px; */
-        scale:1}
-    
-}
-
-@keyframes zoom {
-    0%{
-        scale:1.4;
-    }
-    100%{
-        scale:1;
-    }
-}
 /* #index-details img{
     max-width: 100%;
     height: auto;
@@ -251,20 +231,20 @@ main{
     position:relative;
 }
 #index-detail-box #headline h2{
-    margin-left:9%;
+    text-align: center;
     font-size: 35px;
     color: rgb(205, 111, 4);
     animation: slide_in 0.5s ease-in-out;
 }
 
-@keyframes slide_in {
+/* @keyframes slide_in {
     from {
         transform: translateX(-50%);
     }
     to{
         transform: translateX(0);
     }
-}
+} */
 
 #headline-support{
     background-color: #8b0202;
