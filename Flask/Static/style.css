@@ -113,7 +113,7 @@ header{
     position:relative;
     animation: slide_down 0.25s ease-in-out;   
 }
-/* 
+
 @keyframes slide_down {
     0% {
         transform: translateY(-100%);
@@ -121,7 +121,7 @@ header{
     100% {
         transform: translateY(0);
     }
-} */
+} 
 
 header a{
     color:#ffffff;
@@ -875,3 +875,23 @@ footer {
         transform: translateX(0);
     }
 }
+
+/* width */
+::-webkit-scrollbar {
+    width: 5px;
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+  }
+   
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: #e8491d; 
+  }
+  
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #e64f25; 
+  }

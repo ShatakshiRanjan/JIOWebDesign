@@ -6,6 +6,12 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='Chat.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='idex.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='Images/favicon.ico') }}">
+    <style>
+        h2 {
+            text-align: left;
+            margin: 20px;
+        }
+    </style>
 </head>
 <body>
     <div id="posts">
@@ -13,7 +19,6 @@
         <p>{{ post.body }}</p>
         <small>By {{ post.first_name }} {{ post.last_name }} on {{ post.created_at }}</small>
     </div>
-
     <h2>Comments</h2>
     <form method="POST">
         <textarea name="body" placeholder="Write your comment here..." required></textarea><br>
