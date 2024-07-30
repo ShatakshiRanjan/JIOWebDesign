@@ -15,7 +15,7 @@ h1 {
 }
 
 .post, .comment {
-    position: relative; /* Add this to use absolute positioning for delete button */
+    position: relative; 
     background: #fff;
     padding: 1%;
     margin-bottom: 20px;
