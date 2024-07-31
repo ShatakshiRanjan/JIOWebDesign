@@ -37,6 +37,14 @@
             border-radius: 4px;
             box-sizing: border-box;
         }
+        .radio-group {
+            display: flex;
+            gap: 15%;
+        }
+        .radio-group label {
+            display: flex;
+            align-items: center;
+        }
         .form-group-half {
             width: 48%;
             display: inline-block;
@@ -54,6 +62,7 @@
             font-weight: bold;
             cursor: pointer;
         }
+        
         input[type="submit"]:hover {
             background-color: #300983;
         }
@@ -118,20 +127,12 @@
     <form id="taskForm" method="POST" action="/submit_task">
         <div class="form-group form-group-full">
             <label for="type">Type:</label>
-            <label><input type="radio" name="type" value="project" onclick="toggleFields()"> Project</label>
-            <label><input type="radio" name="type" value="event" onclick="toggleFields()"> Event</label>
-            <label><input type="radio" name="type" value="task" onclick="toggleFields()"> Task</label>
-        </div>
-
-        <div class="form-group form-group-full" id="nameGroup">
-            <label for="name">Name:</label>
-            <input type="text" id="name" name="name">
-        </div>
-
-        <div class="form-group form-group-full" id="descriptionGroup">
-            <label for="description">Description:</label>
-            <textarea id="description" name="description"></textarea>
-        </div>
+            <div class="radio-group">
+                <label><input type="radio" name="type" value="project" onclick="toggleFields()" checked> Project</label>
+                <label><input type="radio" name="type" value="event" onclick="toggleFields()"> Event</label>
+                <label><input type="radio" name="type" value="task" onclick="toggleFields()"> Task</label>
+            </div>
+        </div>        
 
         <div class="form-group form-group-full" id="projectGroup" style="display:none;">
             <label for="project_id">Project:</label>
@@ -140,6 +141,26 @@
                     <option value="{{ project.id }}">{{ project.name }}</option>
                 {% endfor %}
             </select>
+        </div>
+
+        <div class="form-group form-group-full" id="nameGroup">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name">
+        </div>
+
+        <div class="form-group form-group-full" id="assignedToGroup" style="display:none;">
+            <label for="assignedTo">Assigned To:</label>
+            <div class="dropdown-checkbox">
+                <button type="button" class="dropbtn">Select Users</button>
+                <div class="dropdown-checkbox-content" id="assignedTo">
+                    {% for user in users %}
+                        <label>
+                            <input type="checkbox" name="assignedTo[]" value="{{ user.id }}">
+                            {{ user.first_name }} {{ user.last_name }}
+                        </label>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
 
         <div class="form-group form-group-full" id="dateGroup" style="display:none;">
@@ -174,22 +195,12 @@
             </div>
         </div>
 
-        <div class="form-group form-group-full" id="assignedToGroup" style="display:none;">
-            <label for="assignedTo">Assigned To:</label>
-            <div class="dropdown-checkbox">
-                <button type="button" class="dropbtn">Select Users</button>
-                <div class="dropdown-checkbox-content" id="assignedTo">
-                    {% for user in users %}
-                        <label>
-                            <input type="checkbox" name="assignedTo[]" value="{{ user.id }}">
-                            {{ user.first_name }} {{ user.last_name }}
-                        </label>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-
         <div class="error-message" id="errorMessage">End date and time must be after start date and time.</div>
+
+        <div class="form-group form-group-full" id="descriptionGroup">
+            <label for="description">Description:</label>
+            <textarea id="description" name="description"></textarea>
+        </div>
 
         <input type="submit" value="Submit">
     </form>
