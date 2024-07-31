@@ -15,7 +15,7 @@
     <header>
         <div class="container">
             <div id="brand">
-                <h1>Taskify!</h1>
+                <a href="{{url_for('logout')}}"><h1>Taskify!</h1></a>
             </div>
             <nav>
                 <ul>
@@ -29,7 +29,7 @@
                         <a href="{{ url_for('task') }}">Add Tasks</a>
                     </li>
                     <li id="Logout">
-                        <a href="{{ url_for('logout') }}">Logout</a>
+                        <a href="{{ url_for('home') }}">Logout</a>
                     </li>
                 </ul>
             </nav>
@@ -86,8 +86,5 @@
             </div>
         </div>
     </main>
-    <a href="{{ url_for('discussion_board') }}" id="fixed-round-button">
-        <img src="{{ url_for('static', filename='images/chat.png') }}" alt="Button Image">
-    </a>
 </body>
 </html>
