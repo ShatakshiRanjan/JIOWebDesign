@@ -175,3 +175,73 @@ function confirmDelete(postId) {
         deletePost(postId);
     }
 }
+
+document.addEventListener('click', function(event) {
+    var dropdown = document.querySelector('.dropdown-checkbox-content');
+    if (event.target.matches('.dropbtn')) {
+        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    } else if (!event.target.closest('.dropdown-checkbox')) {
+        dropdown.style.display = 'none';
+    }
+});
+
+function toggleFields() {
+    var type = document.querySelector('input[name="type"]:checked').value;
+    var nameGroup = document.getElementById('nameGroup');
+    var descriptionGroup = document.getElementById('descriptionGroup');
+    var projectGroup = document.getElementById('projectGroup');
+    var dateGroup = document.getElementById('dateGroup');
+    var timeGroup = document.getElementById('timeGroup');
+    var startDateGroup = document.getElementById('startDateGroup');
+    var endDateGroup = document.getElementById('endDateGroup');
+    var assignedToGroup = document.getElementById('assignedToGroup');
+
+    nameGroup.style.display = 'block';
+    descriptionGroup.style.display = 'block';
+
+    if (type === 'project') {
+        projectGroup.style.display = 'none';
+        dateGroup.style.display = 'none';
+        timeGroup.style.display = 'none';
+        startDateGroup.style.display = 'none';
+        endDateGroup.style.display = 'none';
+        assignedToGroup.style.display = 'none';
+    } else if (type === 'event') {
+        projectGroup.style.display = 'block';
+        dateGroup.style.display = 'block';
+        timeGroup.style.display = 'block';
+        startDateGroup.style.display = 'none';
+        endDateGroup.style.display = 'none';
+        assignedToGroup.style.display = 'block';
+    } else if (type === 'task') {
+        projectGroup.style.display = 'block';
+        dateGroup.style.display = 'none';
+        timeGroup.style.display = 'none';
+        startDateGroup.style.display = 'block';
+        endDateGroup.style.display = 'block';
+        assignedToGroup.style.display = 'block';
+    }
+}
+
+document.getElementById('taskForm').addEventListener('submit', function(event) {
+    var type = document.querySelector('input[name="type"]:checked').value;
+    var startDate = document.getElementById('startDate').value;
+    var startTime = document.getElementById('startTime').value;
+    var endDate = document.getElementById('endDate').value;
+    var endTime = document.getElementById('endTime').value;
+
+    var startDateTime = new Date(startDate + 'T' + startTime);
+    var endDateTime = new Date(endDate + 'T' + endTime);
+
+    if (type === 'event' && startDateTime >= endDateTime) {
+        event.preventDefault();
+        document.getElementById('errorMessage').style.display = 'block';
+    } else if (type === 'task' && endDateTime <= startDateTime) {
+        event.preventDefault();
+        document.getElementById('errorMessage').style.display = 'block';
+    } else {
+        document.getElementById('errorMessage').style.display = 'none';
+    }
+});
+
+toggleFields();

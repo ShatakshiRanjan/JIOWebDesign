@@ -5,97 +5,8 @@
     <title>Task Form</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='Images/favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <style>
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-        form {
-            width: 50%;
-            margin: 0 auto;
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .form-group input[type="date"],
-        .form-group input[type="time"],
-        .form-group input[type="text"],
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        .radio-group {
-            display: flex;
-            gap: 15%;
-        }
-        .radio-group label {
-            display: flex;
-            align-items: center;
-        }
-        .form-group-half {
-            width: 48%;
-            display: inline-block;
-        }
-        .form-group-full {
-            width: 100%;
-        }
-        input[type="submit"] {
-            width: 100%;
-            padding: 10px;
-            background-color: #3e10a2;
-            border: none;
-            border-radius: 4px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        
-        input[type="submit"]:hover {
-            background-color: #300983;
-        }
-        .dropdown-checkbox {
-            position: relative;
-            display: inline-block;
-            width: 100%;
-        }
-        .dropdown-checkbox-content {
-            display: none;
-            position: absolute;
-            background-color: #f9f9f9;
-            width: 100%;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            z-index: 1;
-        }
-        .dropdown-checkbox-content label {
-            color: black;
-            padding: 8px 16px;
-            text-decoration: none;
-            display: block;
-        }
-        .dropdown-checkbox-content label:hover {
-            background-color: #f1f1f1;
-        }
-        .dropdown-checkbox:hover .dropdown-checkbox-content {
-            display: block;
-        }
-        .error-message {
-            color: red;
-            display: none;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='idex.css') }}">
+    <script src="{{ url_for('static', filename='idex.js') }}" defer></script>
 </head>
 <body>
     <header>
@@ -144,7 +55,7 @@
         </div>
 
         <div class="form-group form-group-full" id="nameGroup">
-            <label for="name">Name:</label>
+            <label for="name">Title:</label>
             <input type="text" id="name" name="name">
         </div>
 
@@ -204,75 +115,4 @@
 
         <input type="submit" value="Submit">
     </form>
-
-    <script>
-        document.addEventListener('click', function(event) {
-            var dropdown = document.querySelector('.dropdown-checkbox-content');
-            if (event.target.matches('.dropbtn')) {
-                dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-            } else if (!event.target.closest('.dropdown-checkbox')) {
-                dropdown.style.display = 'none';
-            }
-        });
-
-        function toggleFields() {
-            var type = document.querySelector('input[name="type"]:checked').value;
-            var nameGroup = document.getElementById('nameGroup');
-            var descriptionGroup = document.getElementById('descriptionGroup');
-            var projectGroup = document.getElementById('projectGroup');
-            var dateGroup = document.getElementById('dateGroup');
-            var timeGroup = document.getElementById('timeGroup');
-            var startDateGroup = document.getElementById('startDateGroup');
-            var endDateGroup = document.getElementById('endDateGroup');
-            var assignedToGroup = document.getElementById('assignedToGroup');
-
-            nameGroup.style.display = 'block';
-            descriptionGroup.style.display = 'block';
-
-            if (type === 'project') {
-                projectGroup.style.display = 'none';
-                dateGroup.style.display = 'none';
-                timeGroup.style.display = 'none';
-                startDateGroup.style.display = 'none';
-                endDateGroup.style.display = 'none';
-                assignedToGroup.style.display = 'none';
-            } else if (type === 'event') {
-                projectGroup.style.display = 'block';
-                dateGroup.style.display = 'block';
-                timeGroup.style.display = 'block';
-                startDateGroup.style.display = 'none';
-                endDateGroup.style.display = 'none';
-                assignedToGroup.style.display = 'block';
-            } else if (type === 'task') {
-                projectGroup.style.display = 'block';
-                dateGroup.style.display = 'none';
-                timeGroup.style.display = 'none';
-                startDateGroup.style.display = 'block';
-                endDateGroup.style.display = 'block';
-                assignedToGroup.style.display = 'block';
-        }
-    }
-
-    document.getElementById('taskForm').addEventListener('submit', function(event) {
-        var type = document.querySelector('input[name="type"]:checked').value;
-        var startDate = document.getElementById('startDate').value;
-        var startTime = document.getElementById('startTime').value;
-        var endDate = document.getElementById('endDate').value;
-        var endTime = document.getElementById('endTime').value;
-
-        var startDateTime = new Date(startDate + 'T' + startTime);
-        var endDateTime = new Date(endDate + 'T' + endTime);
-
-        if (type === 'event' && startDateTime >= endDateTime) {
-            event.preventDefault();
-            document.getElementById('errorMessage').style.display = 'block';
-        } else if (type === 'task' && endDateTime <= startDateTime) {
-            event.preventDefault();
-            document.getElementById('errorMessage').style.display = 'block';
-        } else {
-            document.getElementById('errorMessage').style.display = 'none';
-        }
-    });
-
-    toggleFields();
-</script>
+</html>
