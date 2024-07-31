@@ -56,7 +56,7 @@ small {
 
 /* Delete buttons */
 .delete-button {
-    position: absolute; /* Position the delete button absolutely */
+    position: absolute;
     top: 15%; /* Adjust top position as needed */
     right: 2%; 
     background: none;

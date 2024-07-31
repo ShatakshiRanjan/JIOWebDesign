@@ -45,8 +45,8 @@
                 <div id="description_sec">
                     <div id="description-bar">
                         <div class="header">
-                            <div class="header-item" style = "float:left; margin-left: 10%">
-                                <span style = "background-color:#d15b5b;">Task</span>
+                            <div class="header-item" style="float:left; margin-left: 10%">
+                                <span style="background-color:#d15b5b;">Task</span>
                             </div>
                             <div class="header-item" style="float:right; margin-right: 10%">
                                 <span>Time</span>
@@ -65,10 +65,10 @@
                             data-start-time="{{ task['timeOfTaskStart'] }}"
                             data-end-date="{{ task['dateOfTaskEnd'] }}"
                             data-end-time="{{ task['timeOfTaskEnd'] }}"
-                            data-dedicated-to="{{ task['dedicatedTo'] }}"
+                            data-dedicated-to="{{ task['assigned_users'] }}"
                             data-description="{{ task['descript'] }}">
                             <input type="checkbox" id="task{{ task['TID'] }}" name="task{{ task['TID'] }}" value="{{ task['TID'] }}" {% if task['completed'] %} checked {% endif %} onclick="completeTask({{ task['TID'] }})">
-                            <label for="task{{ task['TID'] }}">{{ task['task'] }}</label>
+                            <label>{{ task['task'] }}</label>
                             <button class="delete-button" onclick="deleteTask({{ task['TID'] }})">✖</button>
                         </li>
                     {% endfor %}

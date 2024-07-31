@@ -49,7 +49,7 @@
                         data-description="{{ task['descript'] }}"
                         data-completion-date="{{ task['completion_date'] }}">
                         <input type="checkbox" id="task{{ task['TID'] }}" name="task{{ task['TID'] }}" value="{{ task['TID'] }}" checked>
-                        <label for="task{{ task['TID'] }}">{{ task['task'] }}</label>
+                        <label>{{ task['task'] }}</label>
                         <button class="delete-button" onclick="deleteTask({{ task['TID'] }})">✖</button>
                     </li>
                 {% endfor %}

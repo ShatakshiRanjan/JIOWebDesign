@@ -1,4 +1,3 @@
-
 document.querySelectorAll('.task-item').forEach(item => {
     item.addEventListener('mouseover', event => {
         const taskDetails = event.currentTarget.dataset;
