@@ -104,11 +104,13 @@ def nextpage():
         first_name = user['first_name'] if user else None
 
         cursor.execute("""
-            SELECT tasks.TID, tasks.task, tasks.dateOfTaskStart, tasks.timeOfTaskStart, tasks.dateOfTaskEnd, tasks.timeOfTaskEnd, tasks.descript,
+            SELECT tasks.TID, tasks.task, tasks.type, tasks.dateOfTaskStart, tasks.timeOfTaskStart, tasks.dateOfTaskEnd, tasks.timeOfTaskEnd,
+                   tasks.dueDate, tasks.dueTime, tasks.descript, projects.name as project_name,
                    GROUP_CONCAT(CONCAT(users.first_name, ' ', users.last_name) SEPARATOR ', ') AS assigned_users
             FROM tasks
             JOIN task_assignments ON tasks.TID = task_assignments.task_id
             JOIN users ON task_assignments.user_id = users.id
+            JOIN projects ON tasks.project_id = projects.id
             WHERE tasks.completed = FALSE AND tasks.TID IN (
                 SELECT task_id FROM task_assignments WHERE user_id = %s
             )
@@ -123,51 +125,64 @@ def nextpage():
     
     return redirect(url_for('login'))
 
-@app.route('/delete_task', methods=['POST'])
-def delete_task():
-    user_id = session.get("user_id")
-    if not user_id:
-        return jsonify(success=False, message="User not logged in"), 401
-
-    task_id = request.json.get('task_id')
-    if not task_id:
-        return jsonify(success=False, message="Task ID not provided"), 400
-
-    try:
-        cursor = mysql.connection.cursor()
-        cursor.execute("DELETE FROM task_assignments WHERE task_id = %s", (task_id,))
-        cursor.execute("DELETE FROM tasks WHERE TID = %s", (task_id,))
-        mysql.connection.commit()
-        cursor.close()
-        
-        return jsonify(success=True)
-    except Exception as e:
-        mysql.connection.rollback()
-        print(f"Error deleting task: {e}")
-        return jsonify(success=False, message="Database error"), 500
-
 @app.route('/task')
 def task():
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute("SELECT id, first_name, last_name FROM users")
     users = cursor.fetchall()
+    
+    cursor.execute("SELECT id, name FROM projects")
+    projects = cursor.fetchall()
+    
     cursor.close()
-    return render_template('htmltask.html', users=users)
+    return render_template('htmltask.html', users=users, projects=projects)
 
 @app.route('/submit_task', methods=['POST'])
 def submit_task():
-    task = request.form['task']
-    dateOfTaskStart = request.form['dateOfTaskStart']
-    timeOfTaskStart = request.form['timeOfTaskStart']
-    dateOfTaskEnd = request.form['dateOfTaskEnd']
-    timeOfTaskEnd = request.form['timeOfTaskEnd']
-    dedicatedTo = request.form.getlist('dedicatedTo[]')
-    descript = request.form['descript']
+    task_type = request.form['type']
+    if task_type == 'project':
+        # Handle project creation
+        project_name = request.form['name']
+        project_description = request.form['description']
+        
+        sql_project = """
+            INSERT INTO projects (name, description, user_id)
+            VALUES (%s, %s, %s)
+        """
+        cursor = mysql.connection.cursor()
+        cursor.execute(sql_project, (project_name, project_description, session.get("user_id")))
+        mysql.connection.commit()
+        cursor.close()
+        
+        return redirect(url_for('task'))
+
+    # Handle task or event creation
+    task = request.form['name']
+    dateOfTaskStart = request.form.get('startDate') or None
+    timeOfTaskStart = request.form.get('startTime')
+    dateOfTaskEnd = request.form.get('endDate') or None
+    timeOfTaskEnd = request.form.get('endTime')
+    dueDate = request.form.get('date') or None
+    dueTime = request.form.get('time')
+    dedicatedTo = request.form.getlist('assignedTo[]')
+    descript = request.form['description']
+    project_id = request.form['project_id']
     user_id = session.get("user_id")
 
-    sql_task = "INSERT INTO tasks (task, dateOfTaskStart, timeOfTaskStart, dateOfTaskEnd, timeOfTaskEnd, descript, user_id) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-    val_task = (task, dateOfTaskStart, timeOfTaskStart, dateOfTaskEnd, timeOfTaskEnd, descript, user_id)
-
+    if task_type == 'task':
+        sql_task = """
+            INSERT INTO tasks (task, type, dateOfTaskStart, timeOfTaskStart, dateOfTaskEnd, timeOfTaskEnd, dueDate, dueTime, descript, user_id, project_id)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        val_task = (task, task_type, dateOfTaskStart, timeOfTaskStart, dateOfTaskEnd, timeOfTaskEnd, dueDate, dueTime, descript, user_id, project_id)
+    
+    elif task_type == 'event':
+        sql_task = """
+            INSERT INTO tasks (task, type, dateOfTaskStart, timeOfTaskStart, descript, user_id, project_id)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+        """
+        val_task = (task, task_type, dateOfTaskStart, timeOfTaskStart, descript, user_id, project_id)
+    
     cursor = mysql.connection.cursor()
     cursor.execute(sql_task, val_task)
     task_id = cursor.lastrowid
@@ -175,11 +190,12 @@ def submit_task():
     sql_assignment = "INSERT INTO task_assignments (task_id, user_id) VALUES (%s, %s)"
     for user_id in dedicatedTo:
         cursor.execute(sql_assignment, (task_id, user_id))
-    
+
     mysql.connection.commit()
     cursor.close()
 
     return redirect(url_for('task'))
+
 
 @app.route('/complete_task', methods=['POST'])
 def complete_task():
@@ -203,11 +219,13 @@ def completed_tasks():
 
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute("""
-        SELECT tasks.TID, tasks.task, tasks.dateOfTaskStart, tasks.timeOfTaskStart, tasks.dateOfTaskEnd, tasks.timeOfTaskEnd, tasks.descript, tasks.completion_date,
+        SELECT tasks.TID, tasks.task, tasks.type, tasks.dateOfTaskStart, tasks.timeOfTaskStart, tasks.dateOfTaskEnd, tasks.timeOfTaskEnd,
+               tasks.dueDate, tasks.dueTime, tasks.descript, tasks.completion_date, projects.name as project_name,
                GROUP_CONCAT(CONCAT(users.first_name, ' ', users.last_name) SEPARATOR ', ') AS assigned_users
         FROM tasks
         JOIN task_assignments ON tasks.TID = task_assignments.task_id
         JOIN users ON task_assignments.user_id = users.id
+        JOIN projects ON tasks.project_id = projects.id
         WHERE tasks.completed = TRUE AND tasks.TID IN (
             SELECT task_id FROM task_assignments WHERE user_id = %s
         )

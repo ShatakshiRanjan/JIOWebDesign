@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <title>Task Form</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='Images/favicon.ico') }}">
-    <link rel ="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
         h1 {
             text-align: center;
@@ -86,7 +86,6 @@
             color: red;
             display: none;
         }
-
     </style>
 </head>
 <body>
@@ -118,50 +117,76 @@
     <h1>Task Form</h1>
     <form id="taskForm" method="POST" action="/submit_task">
         <div class="form-group form-group-full">
-            <label for="task">Task:</label>
-            <input type="text" id="task" name="task">
+            <label for="type">Type:</label>
+            <label><input type="radio" name="type" value="project" onclick="toggleFields()"> Project</label>
+            <label><input type="radio" name="type" value="event" onclick="toggleFields()"> Event</label>
+            <label><input type="radio" name="type" value="task" onclick="toggleFields()"> Task</label>
         </div>
 
-        <div class="form-group">
+        <div class="form-group form-group-full" id="nameGroup">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name">
+        </div>
+
+        <div class="form-group form-group-full" id="descriptionGroup">
+            <label for="description">Description:</label>
+            <textarea id="description" name="description"></textarea>
+        </div>
+
+        <div class="form-group form-group-full" id="projectGroup" style="display:none;">
+            <label for="project_id">Project:</label>
+            <select id="project_id" name="project_id">
+                {% for project in projects %}
+                    <option value="{{ project.id }}">{{ project.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group form-group-full" id="dateGroup" style="display:none;">
+            <label for="date">Date:</label>
+            <input type="date" id="date" name="date">
+        </div>
+
+        <div class="form-group form-group-full" id="timeGroup" style="display:none;">
+            <label for="time">Time:</label>
+            <input type="time" id="time" name="time">
+        </div>
+
+        <div class="form-group" id="startDateGroup" style="display:none;">
             <div class="form-group-half">
-                <label for="dateOfTaskStart">Start Date:</label>
-                <input type="date" id="dateOfTaskStart" name="dateOfTaskStart">
+                <label for="startDate">Start Date:</label>
+                <input type="date" id="startDate" name="startDate">
             </div>
             <div class="form-group-half">
-                <label for="timeOfTaskStart">Start Time:</label>
-                <input type="time" id="timeOfTaskStart" name="timeOfTaskStart">
+                <label for="startTime">Start Time:</label>
+                <input type="time" id="startTime" name="startTime">
             </div>
         </div>
 
-        <div class="form-group">
+        <div class="form-group" id="endDateGroup" style="display:none;">
             <div class="form-group-half">
-                <label for="dateOfTaskEnd">End Date:</label>
-                <input type="date" id="dateOfTaskEnd" name="dateOfTaskEnd">
+                <label for="endDate">End Date:</label>
+                <input type="date" id="endDate" name="endDate">
             </div>
             <div class="form-group-half">
-                <label for="timeOfTaskEnd">End Time:</label>
-                <input type="time" id="timeOfTaskEnd" name="timeOfTaskEnd">
+                <label for="endTime">End Time:</label>
+                <input type="time" id="endTime" name="endTime">
             </div>
         </div>
 
-        <div class="form-group form-group-full">
-            <label for="dedicatedTo">Assigned To:</label>
+        <div class="form-group form-group-full" id="assignedToGroup" style="display:none;">
+            <label for="assignedTo">Assigned To:</label>
             <div class="dropdown-checkbox">
                 <button type="button" class="dropbtn">Select Users</button>
-                <div class="dropdown-checkbox-content" id="dedicatedTo">
+                <div class="dropdown-checkbox-content" id="assignedTo">
                     {% for user in users %}
                         <label>
-                            <input type="checkbox" name="dedicatedTo[]" value="{{ user.id }}">
+                            <input type="checkbox" name="assignedTo[]" value="{{ user.id }}">
                             {{ user.first_name }} {{ user.last_name }}
                         </label>
                     {% endfor %}
                 </div>
             </div>
-        </div>
-
-        <div class="form-group form-group-full">
-            <label for="descript">Description:</label>
-            <textarea id="descript" name="descript"></textarea>
         </div>
 
         <div class="error-message" id="errorMessage">End date and time must be after start date and time.</div>
@@ -179,26 +204,64 @@
             }
         });
 
-        document.getElementById('taskForm').addEventListener('submit', function(event) {
-            var startDate = document.getElementById('dateOfTaskStart').value;
-            var startTime = document.getElementById('timeOfTaskStart').value;
-            var endDate = document.getElementById('dateOfTaskEnd').value;
-            var endTime = document.getElementById('timeOfTaskEnd').value;
+        function toggleFields() {
+            var type = document.querySelector('input[name="type"]:checked').value;
+            var nameGroup = document.getElementById('nameGroup');
+            var descriptionGroup = document.getElementById('descriptionGroup');
+            var projectGroup = document.getElementById('projectGroup');
+            var dateGroup = document.getElementById('dateGroup');
+            var timeGroup = document.getElementById('timeGroup');
+            var startDateGroup = document.getElementById('startDateGroup');
+            var endDateGroup = document.getElementById('endDateGroup');
+            var assignedToGroup = document.getElementById('assignedToGroup');
 
-            var startDateTime = new Date(startDate + 'T' + startTime);
-            var endDateTime = new Date(endDate + 'T' + endTime);
+            nameGroup.style.display = 'block';
+            descriptionGroup.style.display = 'block';
 
-            console.log(startDateTime);
-            console.log(endDateTime);
+            if (type === 'project') {
+                projectGroup.style.display = 'none';
+                dateGroup.style.display = 'none';
+                timeGroup.style.display = 'none';
+                startDateGroup.style.display = 'none';
+                endDateGroup.style.display = 'none';
+                assignedToGroup.style.display = 'none';
+            } else if (type === 'event') {
+                projectGroup.style.display = 'block';
+                dateGroup.style.display = 'block';
+                timeGroup.style.display = 'block';
+                startDateGroup.style.display = 'none';
+                endDateGroup.style.display = 'none';
+                assignedToGroup.style.display = 'block';
+            } else if (type === 'task') {
+                projectGroup.style.display = 'block';
+                dateGroup.style.display = 'none';
+                timeGroup.style.display = 'none';
+                startDateGroup.style.display = 'block';
+                endDateGroup.style.display = 'block';
+                assignedToGroup.style.display = 'block';
+        }
+    }
 
-            if (startDateTime >= endDateTime) {
-                event.preventDefault();
-                document.getElementById('errorMessage').style.display = 'block';
-            } else {
-                document.getElementById('errorMessage').style.display = 'none';
-            }
-        });
+    document.getElementById('taskForm').addEventListener('submit', function(event) {
+        var type = document.querySelector('input[name="type"]:checked').value;
+        var startDate = document.getElementById('startDate').value;
+        var startTime = document.getElementById('startTime').value;
+        var endDate = document.getElementById('endDate').value;
+        var endTime = document.getElementById('endTime').value;
 
-    </script>
-</body>
-</html>
+        var startDateTime = new Date(startDate + 'T' + startTime);
+        var endDateTime = new Date(endDate + 'T' + endTime);
+
+        if (type === 'event' && startDateTime >= endDateTime) {
+            event.preventDefault();
+            document.getElementById('errorMessage').style.display = 'block';
+        } else if (type === 'task' && endDateTime <= startDateTime) {
+            event.preventDefault();
+            document.getElementById('errorMessage').style.display = 'block';
+        } else {
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+    });
+
+    toggleFields();
+</script>
