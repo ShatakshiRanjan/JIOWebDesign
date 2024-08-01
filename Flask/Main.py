@@ -20,16 +20,16 @@ mysql = MySQL(app)
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static', 'Images'), 'favicon.ico')
 
-# scheduler = BackgroundScheduler()
+scheduler = BackgroundScheduler()
 
-# def remove_old_completed_tasks():
-#     cursor = mysql.connection.cursor()
-#     cursor.execute("DELETE FROM tasks WHERE completed = TRUE AND completion_date < NOW() - INTERVAL 1 DAY")
-#     mysql.connection.commit()
-#     cursor.close()
+def remove_old_completed_tasks():
+    cursor = mysql.connection.cursor()
+    cursor.execute("DELETE FROM tasks WHERE completed = TRUE AND completion_date < NOW() - INTERVAL 1 DAY")
+    mysql.connection.commit()
+    cursor.close()
 
-# scheduler.add_job(func=remove_old_completed_tasks, trigger="interval", days=1)
-# scheduler.start()
+scheduler.add_job(func=remove_old_completed_tasks, trigger="interval", days=1)
+scheduler.start()
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -95,24 +95,28 @@ def nextpage():
 
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     
-    cursor.execute("SELECT first_name FROM users WHERE id = %s", (user_id,))
-    user = cursor.fetchone()
-    first_name = user['first_name'] if user else None
+    if user_id == "admin":
+        first_name = "admin"
+        tasks = []
+    else:
+        cursor.execute("SELECT first_name FROM users WHERE id = %s", (user_id,))
+        user = cursor.fetchone()
+        first_name = user['first_name'] if user else None
 
-    cursor.execute("""
-        SELECT tasks.TID, tasks.task, tasks.type, tasks.dateOfTaskStart, tasks.timeOfTaskStart, tasks.dateOfTaskEnd, tasks.timeOfTaskEnd,
-                tasks.dueDate, tasks.dueTime, tasks.descript, projects.name as project_name,
-                GROUP_CONCAT(CONCAT(users.first_name, ' ', users.last_name) SEPARATOR ', ') AS assigned_users
-        FROM tasks
-        JOIN task_assignments ON tasks.TID = task_assignments.task_id
-        JOIN users ON task_assignments.user_id = users.id
-        JOIN projects ON tasks.project_id = projects.id
-        WHERE tasks.completed = FALSE AND tasks.TID IN (
-            SELECT task_id FROM task_assignments WHERE user_id = %s
-        )
-        GROUP BY tasks.TID
-    """, (user_id,))
-    tasks = cursor.fetchall()
+        cursor.execute("""
+            SELECT tasks.TID, tasks.task, tasks.type, tasks.dateOfTaskStart, tasks.timeOfTaskStart, tasks.dateOfTaskEnd, tasks.timeOfTaskEnd,
+                   tasks.dueDate, tasks.dueTime, tasks.descript, projects.name as project_name,
+                   GROUP_CONCAT(CONCAT(users.first_name, ' ', users.last_name) SEPARATOR ', ') AS assigned_users
+            FROM tasks
+            JOIN task_assignments ON tasks.TID = task_assignments.task_id
+            JOIN users ON task_assignments.user_id = users.id
+            JOIN projects ON tasks.project_id = projects.id
+            WHERE tasks.completed = FALSE AND tasks.TID IN (
+                SELECT task_id FROM task_assignments WHERE user_id = %s
+            )
+            GROUP BY tasks.TID
+        """, (user_id,))
+        tasks = cursor.fetchall()
     
     cursor.close()
     
