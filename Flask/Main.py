@@ -140,8 +140,9 @@ def task():
 @app.route('/submit_task', methods=['POST'])
 def submit_task():
     task_type = request.form['type']
+    user_id = session.get("user_id")
+
     if task_type == 'project':
-        # Handle project creation
         project_name = request.form['name']
         project_description = request.form['description']
         
@@ -150,45 +151,46 @@ def submit_task():
             VALUES (%s, %s, %s)
         """
         cursor = mysql.connection.cursor()
-        cursor.execute(sql_project, (project_name, project_description, session.get("user_id")))
+        cursor.execute(sql_project, (project_name, project_description, user_id))
         mysql.connection.commit()
         cursor.close()
         
         return redirect(url_for('task'))
 
     # Handle task or event creation
-    task = request.form['name']
-    dateOfTaskStart = request.form.get('startDate') or None
-    timeOfTaskStart = request.form.get('startTime')
-    dateOfTaskEnd = request.form.get('endDate') or None
-    timeOfTaskEnd = request.form.get('endTime')
-    dueDate = request.form.get('date') or None
-    dueTime = request.form.get('time')
-    dedicatedTo = request.form.getlist('assignedTo[]')
-    descript = request.form['description']
+    task_name = request.form['name']
+    description = request.form['description']
     project_id = request.form['project_id']
-    user_id = session.get("user_id")
-
+    assigned_to = request.form.getlist('assignedTo[]')
+    
     if task_type == 'task':
+        start_date = request.form.get('startDate') or None
+        start_time = request.form.get('startTime') or None
+        end_date = request.form.get('endDate') or None
+        end_time = request.form.get('endTime') or None
+        
         sql_task = """
-            INSERT INTO tasks (task, type, dateOfTaskStart, timeOfTaskStart, dateOfTaskEnd, timeOfTaskEnd, dueDate, dueTime, descript, user_id, project_id)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO tasks (task, type, dateOfTaskStart, timeOfTaskStart, dateOfTaskEnd, timeOfTaskEnd, descript, user_id, project_id)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
-        val_task = (task, task_type, dateOfTaskStart, timeOfTaskStart, dateOfTaskEnd, timeOfTaskEnd, dueDate, dueTime, descript, user_id, project_id)
+        val_task = (task_name, task_type, start_date, start_time, end_date, end_time, description, user_id, project_id)
     
     elif task_type == 'event':
+        due_date = request.form.get('date') or None
+        due_time = request.form.get('time') or None
+        
         sql_task = """
-            INSERT INTO tasks (task, type, dateOfTaskStart, timeOfTaskStart, descript, user_id, project_id)
+            INSERT INTO tasks (task, type, dueDate, dueTime, descript, user_id, project_id)
             VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
-        val_task = (task, task_type, dateOfTaskStart, timeOfTaskStart, descript, user_id, project_id)
+        val_task = (task_name, task_type, due_date, due_time, description, user_id, project_id)
     
     cursor = mysql.connection.cursor()
     cursor.execute(sql_task, val_task)
     task_id = cursor.lastrowid
 
     sql_assignment = "INSERT INTO task_assignments (task_id, user_id) VALUES (%s, %s)"
-    for user_id in dedicatedTo:
+    for user_id in assigned_to:
         cursor.execute(sql_assignment, (task_id, user_id))
 
     mysql.connection.commit()
@@ -196,6 +198,28 @@ def submit_task():
 
     return redirect(url_for('task'))
 
+@app.route('/delete_task', methods=['POST'])
+def delete_task():
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify(success=False, message="User not logged in"), 401
+
+    task_id = request.json.get('task_id')
+    if not task_id:
+        return jsonify(success=False, message="Task ID not provided"), 400
+
+    try:
+        cursor = mysql.connection.cursor()
+        cursor.execute("DELETE FROM task_assignments WHERE task_id = %s", (task_id,))
+        cursor.execute("DELETE FROM tasks WHERE TID = %s", (task_id,))
+        mysql.connection.commit()
+        cursor.close()
+        
+        return jsonify(success=True)
+    except Exception as e:
+        mysql.connection.rollback()
+        print(f"Error deleting task: {e}")
+        return jsonify(success=False, message="Database error"), 500
 
 @app.route('/complete_task', methods=['POST'])
 def complete_task():

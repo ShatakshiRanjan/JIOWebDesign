@@ -3,31 +3,42 @@ document.querySelectorAll('.task-item').forEach(item => {
         const taskDetails = event.currentTarget.dataset;
 
         const formatDate = (dateString) => {
+            if (!dateString) return 'N/A';
             const options = { year: 'numeric', month: 'long', day: 'numeric' };
             const date = new Date(dateString);
             return date.toLocaleDateString(undefined, options);
         };
 
         const formatTime = (timeString) => {
+            if (!timeString) return 'N/A';
             const [hours, minutes] = timeString.split(':').map(Number);
             const date = new Date();
             date.setHours(hours, minutes);
             return date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', hour12: false });
         };
 
-        const formatDateTime = (dateTimeString) => {
-            const [date, time] = dateTimeString.split(' ');
-            return `${formatDate(date)} at ${formatTime(time)}`;
-        };
+        const taskType = taskDetails.type;
 
         document.getElementById('details-task').textContent = taskDetails.task;
-        document.getElementById('details-start-date').textContent = formatDate(taskDetails.startDate);
-        document.getElementById('details-start-time').textContent = formatTime(taskDetails.startTime);
-        document.getElementById('details-end-date').textContent = formatDate(taskDetails.endDate);
-        document.getElementById('details-end-time').textContent = formatTime(taskDetails.endTime);
         document.getElementById('details-dedicated-to').textContent = taskDetails.dedicatedTo;
         document.getElementById('details-description').textContent = taskDetails.description;
-        document.getElementById('details-completion-date').textContent = formatDateTime(taskDetails.completionDate);
+        document.getElementById('details-completion-date').textContent = formatDate(taskDetails.completionDate);
+
+        if (taskType === 'event') {
+            document.getElementById('details-due-date-time').style.display = 'block';
+            document.getElementById('details-start-date-time').style.display = 'none';
+            document.getElementById('details-end-date-time').style.display = 'none';
+            document.getElementById('details-due-date').textContent = formatDate(taskDetails.dueDate);
+            document.getElementById('details-due-time').textContent = formatTime(taskDetails.dueTime);
+        } else if (taskType === 'task') {
+            document.getElementById('details-due-date-time').style.display = 'none';
+            document.getElementById('details-start-date-time').style.display = 'block';
+            document.getElementById('details-end-date-time').style.display = 'block';
+            document.getElementById('details-start-date').textContent = formatDate(taskDetails.startDate);
+            document.getElementById('details-start-time').textContent = formatTime(taskDetails.startTime);
+            document.getElementById('details-end-date').textContent = formatDate(taskDetails.endDate);
+            document.getElementById('details-end-time').textContent = formatTime(taskDetails.endTime);
+        }
     });
 });
 
@@ -171,7 +182,7 @@ document.querySelectorAll('.delete-button').forEach(button => {
 });
 
 function confirmDelete(postId) {
-    if (confirm('Are you sure you want to delete this post?')) {
+    if (confirm('Please confirm deletion.')) {
         deletePost(postId);
     }
 }

@@ -131,7 +131,7 @@
                 <label><input type="radio" name="type" value="event" onclick="toggleFields()"> Event</label>
                 <label><input type="radio" name="type" value="task" onclick="toggleFields()"> Task</label>
             </div>
-        </div>        
+        </div>
 
         <div class="form-group form-group-full" id="projectGroup" style="display:none;">
             <label for="project_id">Project:</label>
@@ -249,29 +249,28 @@
                 startDateGroup.style.display = 'block';
                 endDateGroup.style.display = 'block';
                 assignedToGroup.style.display = 'block';
+            }
         }
-    }
 
-    document.getElementById('taskForm').addEventListener('submit', function(event) {
-        var type = document.querySelector('input[name="type"]:checked').value;
-        var startDate = document.getElementById('startDate').value;
-        var startTime = document.getElementById('startTime').value;
-        var endDate = document.getElementById('endDate').value;
-        var endTime = document.getElementById('endTime').value;
+        document.getElementById('taskForm').addEventListener('submit', function(event) {
+            var type = document.querySelector('input[name="type"]:checked').value;
+            var startDate = document.getElementById('startDate').value;
+            var startTime = document.getElementById('startTime').value;
+            var endDate = document.getElementById('endDate').value;
+            var endTime = document.getElementById('endTime').value;
 
-        var startDateTime = new Date(startDate + 'T' + startTime);
-        var endDateTime = new Date(endDate + 'T' + endTime);
+            var startDateTime = new Date(startDate + 'T' + startTime);
+            var endDateTime = new Date(endDate + 'T' + endTime);
 
-        if (type === 'event' && startDateTime >= endDateTime) {
-            event.preventDefault();
-            document.getElementById('errorMessage').style.display = 'block';
-        } else if (type === 'task' && endDateTime <= startDateTime) {
-            event.preventDefault();
-            document.getElementById('errorMessage').style.display = 'block';
-        } else {
-            document.getElementById('errorMessage').style.display = 'none';
-        }
-    });
+            if (type === 'task' && endDateTime <= startDateTime) {
+                event.preventDefault();
+                document.getElementById('errorMessage').style.display = 'block';
+            } else {
+                document.getElementById('errorMessage').style.display = 'none';
+            }
+        });
 
-    toggleFields();
-</script>
+        toggleFields();
+    </script>
+</body>
+</html>
