@@ -3,7 +3,7 @@ from flask_mysqldb import MySQL
 import MySQLdb.cursors
 import hashlib
 import os
-import datetime
+from datetime import timedelta
 from apscheduler.schedulers.background import BackgroundScheduler
 import config
 
@@ -60,10 +60,6 @@ def login():
         email = request.form.get("email")
         password = request.form.get("password")
         
-        if email == "admin@mail.com" and password == "admin":
-            session["user_id"] = "admin"
-            return redirect(url_for("nextpage"))
-        
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
         
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -94,35 +90,42 @@ def nextpage():
         return redirect(url_for('login'))
 
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    
-    if user_id == "admin":
-        first_name = "admin"
-        tasks = []
-    else:
-        cursor.execute("SELECT first_name FROM users WHERE id = %s", (user_id,))
-        user = cursor.fetchone()
-        first_name = user['first_name'] if user else None
 
-        cursor.execute("""
-            SELECT tasks.TID, tasks.task, tasks.type, tasks.dateOfTaskStart, tasks.timeOfTaskStart, tasks.dateOfTaskEnd, tasks.timeOfTaskEnd,
-                   tasks.dueDate, tasks.dueTime, tasks.descript, projects.name as project_name,
-                   GROUP_CONCAT(CONCAT(users.first_name, ' ', users.last_name) SEPARATOR ', ') AS assigned_users
-            FROM tasks
-            JOIN task_assignments ON tasks.TID = task_assignments.task_id
-            JOIN users ON task_assignments.user_id = users.id
-            JOIN projects ON tasks.project_id = projects.id
-            WHERE tasks.completed = FALSE AND tasks.TID IN (
-                SELECT task_id FROM task_assignments WHERE user_id = %s
-            )
-            GROUP BY tasks.TID
-        """, (user_id,))
-        tasks = cursor.fetchall()
-    
+    cursor.execute("SELECT first_name FROM users WHERE id = %s", (user_id,))
+    user = cursor.fetchone()
+    first_name = user['first_name'] if user else None
+
+    cursor.execute("""
+        SELECT tasks.TID, tasks.task, tasks.type, tasks.dateOfTaskStart, tasks.timeOfTaskStart, tasks.dateOfTaskEnd, tasks.timeOfTaskEnd,
+            tasks.dueDate, tasks.dueTime, tasks.descript, projects.name as project_name,
+            GROUP_CONCAT(CONCAT(users.first_name, ' ', users.last_name) SEPARATOR ', ') AS assigned_users
+        FROM tasks
+        JOIN task_assignments ON tasks.TID = task_assignments.task_id
+        JOIN users ON task_assignments.user_id = users.id
+        JOIN projects ON tasks.project_id = projects.id
+        WHERE tasks.completed = FALSE AND tasks.TID IN (
+            SELECT task_id FROM task_assignments WHERE user_id = %s
+        )
+        GROUP BY tasks.TID
+    """, (user_id,))
+    tasks = cursor.fetchall()
+
+    # Convert timedelta objects to strings
+    for task in tasks:
+        if isinstance(task['dateOfTaskStart'], timedelta):
+            task['dateOfTaskStart'] = str(task['dateOfTaskStart'])
+        if isinstance(task['dateOfTaskEnd'], timedelta):
+            task['dateOfTaskEnd'] = str(task['dateOfTaskEnd'])
+        if isinstance(task['dueDate'], timedelta):
+            task['dueDate'] = str(task['dueDate'])
+        if isinstance(task['dueTime'], timedelta):
+            task['dueTime'] = str(task['dueTime'])
+
     cursor.close()
-    
+
     if first_name:
         return render_template('dashboard.html', first_name=first_name, tasks=tasks)
-    
+
     return redirect(url_for('login'))
 
 @app.route('/task')
