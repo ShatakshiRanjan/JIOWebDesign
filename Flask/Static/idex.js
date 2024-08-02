@@ -1,5 +1,5 @@
 document.querySelectorAll('.task-item').forEach(item => {
-    item.addEventListener('mouseover', event => {
+    item.addEventListener('click', event => {
         const taskDetails = event.currentTarget.dataset;
 
         const formatDate = (dateString) => {
@@ -22,7 +22,6 @@ document.querySelectorAll('.task-item').forEach(item => {
         document.getElementById('details-task').textContent = taskDetails.task;
         document.getElementById('details-dedicated-to').textContent = taskDetails.dedicatedTo;
         document.getElementById('details-description').textContent = taskDetails.description;
-        document.getElementById('details-completion-date').textContent = formatDate(taskDetails.completionDate);
 
         if (taskType === 'event') {
             document.getElementById('details-due-date-time').style.display = 'block';
@@ -39,8 +38,20 @@ document.querySelectorAll('.task-item').forEach(item => {
             document.getElementById('details-end-date').textContent = formatDate(taskDetails.endDate);
             document.getElementById('details-end-time').textContent = formatTime(taskDetails.endTime);
         }
+
+        openModal();
     });
 });
+
+function openModal() {
+    document.getElementById('task-details-modal').style.display = 'block';
+    document.getElementById('modal-overlay').style.display = 'block';
+}
+
+function closeModal() {
+    document.getElementById('task-details-modal').style.display = 'none';
+    document.getElementById('modal-overlay').style.display = 'none';
+}
 
 function completeTask(taskId) {
     fetch('/complete_task', {
@@ -130,22 +141,13 @@ function deleteTask(taskId) {
     });
 }
 
-document.querySelectorAll('.delete-button').forEach(button => {
+document.querySelectorAll('.delete-button1').forEach(button => {
     button.addEventListener('click', event => {
         event.stopPropagation();
         const taskId = event.currentTarget.parentElement.querySelector('input[type="checkbox"]').value;
         deleteTask(taskId);
     });
 });
-
-window.onload = function() {
-    if (!sessionStorage.getItem('reloaded')) {
-        sessionStorage.setItem('reloaded', 'yes');
-        window.location.reload();
-    } else {
-        sessionStorage.removeItem('reloaded');
-    }
-};
 
 function deletePost(postId) {
     fetch('/delete_post', {
