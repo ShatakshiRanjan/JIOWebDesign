@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Discussion Board</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='w3.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='Chat.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='idex.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
@@ -34,31 +35,15 @@
         </div>
     </header>
     <main>
-        <h1>Discussion Board</h1>
-        <button  class="new-button" onclick="document.getElementById('new_post_modal').style.display='block'"><span>Create New Post</span></button>
-        <div id="new_post_modal" style="display: none" class="w3-modal">
-            <div class="w3-modal-content w3-animate-top w3-card-4">
-                <h1 style="margin-top: 2%">Create New Post</h1>
-                <form method="POST">
-                    <input type="text" name="title" placeholder="Title" required><br>
-                    <textarea name="body" placeholder="Write your post here..." required></textarea><br>
-                    <button class=sub-button type="submit">Submit</button>
-                </form>
-                <div style="text-align: center;">
-                    <button class="new-button" onclick="document.getElementById('new_post_modal').style.display='none'" style="width:50%; margin-bottom: 2%;"><span>Back to Discussion Board</span></button>
-                </div>
-                <a href="{{ url_for('nextpage') }}" id="fixed-round-button">
-                    <img src="{{ url_for('static', filename='images/to-do.png') }}" alt="Button Image">
-                </a>
-            </div>
-        </div>
+        <h1>Archieved Chats</h1>
+        
         <div id="posts">
-            {% for post in posts %}
+            {% for x in archieved_post %}
             <div class="post">
-                <h2><a style="text-decoration: none; color: black" href="{{ url_for('post', post_id=post.id) }}">{{ post.title }}</a></h2>
-                <p>{{ post.body }}</p>
-                <small>By {{ post.first_name }} {{ post.last_name }} on {{ post.created_at }}</small>
-                <button class="delete-button" onclick="confirmDelete({{ post.id }})">✖</button>
+                <h2><a style="text-decoration: none; color: black" href="{{ url_for('archieved_post', archieved_id=x.id) }}">{{ x.title }}</a></h2>
+                <p>{{ x.body }}</p>
+                <small>By {{ x.first_name }} {{ x.last_name }} on {{ x.created_at }}</small>
+                <!-- <button class="delete-button" onclick="confirmDelete({{ archieved_post.id }})">✖</button> -->
             </div>
             {% endfor %}
         </div>

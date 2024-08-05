@@ -76,11 +76,13 @@ def login():
 
         if user['passw'] == hashed_password:
             session["user_id"] = user['id']
+            session.permanent = True
             return redirect(url_for("nextpage"))
         else:
             return render_template("login.html", error="Incorrect username or password")
 
     return render_template("login.html")
+
 
 @app.route('/')
 def home():
@@ -255,7 +257,7 @@ def delete_post():
         print(f"Error deleting post: {e}")
         return jsonify(success=False, message="Database error"), 500
 
-@app.route('/discussion_board')
+@app.route('/discussion_board', methods=['GET', 'POST'])
 def discussion_board():
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute("""
@@ -266,10 +268,6 @@ def discussion_board():
     """)
     posts = cursor.fetchall()
     cursor.close()
-    return render_template('CommunityChat.html', posts=posts)
-
-@app.route('/new_post', methods=['GET', 'POST'])
-def new_post():
     if request.method == 'POST':
         title = request.form.get('title')
         body = request.form.get('body')
@@ -280,7 +278,58 @@ def new_post():
         mysql.connection.commit()
         cursor.close()
         return redirect(url_for('discussion_board'))
-    return render_template('newPost.html')
+    return render_template('CommunityChat.html', posts=posts)
+
+@app.route('/archieved_posts', methods=['GET', 'POST'])
+def archieved_posts():
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute("""
+        SELECT archieved_posts.id, archieved_posts.title, archieved_posts.body, archieved_posts.created_at, users.first_name, users.last_name 
+        FROM archieved_posts
+        JOIN users ON archieved_posts.user_id = users.id
+        ORDER BY archieved_posts.created_at DESC
+    """)
+    archieved_posts = cursor.fetchall()
+    cursor.close()
+    return render_template('ArchievedChat.html', archieved_post=archieved_posts)
+
+@app.route('/archieved_post/<int:archieved_id>', methods=['GET', 'POST'])
+def archieved_post(archieved_id):
+
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute("""
+        SELECT archieved_posts.*, users.first_name, users.last_name 
+        FROM archieved_posts 
+        JOIN users ON archieved_posts.user_id = users.id 
+        WHERE archieved_posts.id = %s
+    """, (archieved_id,))
+    post = cursor.fetchone()
+
+    cursor.execute("""
+        SELECT comments.archieved, comments.body, comments.created_at, users.first_name, users.last_name 
+        FROM comments 
+        JOIN users ON comments.user_id = users.id 
+        WHERE comments.archieved_id = %s
+        ORDER BY comments.created_at ASC
+    """, (archieved_id,))
+    comments = cursor.fetchall()
+    cursor.close()
+    
+    return render_template('Post.html', post=post, comments=comments, archieved_check=True)
+
+# @app.route('/new_post', methods=['GET', 'POST'])
+# def new_post():
+#     if request.method == 'POST':
+#         title = request.form.get('title')
+#         body = request.form.get('body')
+#         user_id = session.get('user_id')
+
+#         cursor = mysql.connection.cursor()
+#         cursor.execute("INSERT INTO posts (user_id, title, body) VALUES (%s, %s, %s)", (user_id, title, body))
+#         mysql.connection.commit()
+#         cursor.close()
+#         return redirect(url_for('discussion_board'))
+#     return render_template('newPost.html')
 
 @app.route('/post/<int:post_id>', methods=['GET', 'POST'])
 def post(post_id):
@@ -303,7 +352,7 @@ def post(post_id):
     post = cursor.fetchone()
 
     cursor.execute("""
-        SELECT comments.body, comments.created_at, users.first_name, users.last_name 
+        SELECT comments.archieved, comments.body, comments.created_at, users.first_name, users.last_name 
         FROM comments 
         JOIN users ON comments.user_id = users.id 
         WHERE comments.post_id = %s
@@ -312,7 +361,7 @@ def post(post_id):
     comments = cursor.fetchall()
     cursor.close()
     
-    return render_template('Post.html', post=post, comments=comments)
+    return render_template('Post.html', post=post, comments=comments, archieved_check=False)
 
 @app.route('/calendar')
 def calendar():
