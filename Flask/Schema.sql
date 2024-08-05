@@ -6,7 +6,9 @@ DROP TABLE IF EXISTS comments;
 DROP TABLE IF EXISTS posts;
 DROP TABLE IF EXISTS task_assignments;
 DROP TABLE IF EXISTS tasks;
+DROP TABLE IF EXISTS projects;
 DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS projects;
 
 #Create users table
 CREATE TABLE users (
@@ -17,18 +19,36 @@ CREATE TABLE users (
     passw VARCHAR(255) NOT NULL
 );
 
+#Create projects table
+CREATE TABLE projects (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    user_id INT,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+#Insert the General project
+INSERT INTO projects (name, description, user_id) VALUES ('General', 'Default project for tasks without a specific project', NULL);
+
 #Create tasks table
 CREATE TABLE tasks (
     TID INT AUTO_INCREMENT PRIMARY KEY,
     task TEXT NOT NULL,
-    dateOfTaskStart DATE NOT NULL,
-    timeOfTaskStart TIME NOT NULL,
-    dateOfTaskEnd DATE NOT NULL,
-    timeOfTaskEnd TIME NOT NULL,
+    type ENUM('event', 'task') NOT NULL,
+    dateOfTaskStart DATE NULL,
+    timeOfTaskStart TIME NULL,
+    dateOfTaskEnd DATE NULL,
+    timeOfTaskEnd TIME NULL,
+    dueDate DATE NULL,
+    dueTime TIME NULL,
     descript TEXT NOT NULL,
     user_id INT,
+    project_id INT,
     completed BOOLEAN DEFAULT FALSE,
-    completion_date TIMESTAMP NULL DEFAULT NULL
+    completion_date TIMESTAMP NULL DEFAULT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (project_id) REFERENCES projects(id)
 );
 
 #Create task_assignments table
@@ -61,8 +81,10 @@ CREATE TABLE comments (
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
+select * from projects;
+select * from tasks;
+select * from task_assignments;
+select * from projects;
 select * from posts;
 select * from comments;
-select * from task_assignments;
-select * from tasks;
 select * from users;

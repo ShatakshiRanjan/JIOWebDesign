@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='idex.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <script src="{{ url_for('static', filename='idex.js') }}" defer></script>
     <script src="{{ url_for('static', filename='moment.min.js') }}" defer></script>
     <script src="{{ url_for('static', filename='calendar.js') }}" defer></script>
     <title>Dashboard</title>
@@ -15,7 +14,7 @@
     <header>
         <div class="container">
             <div id="brand">
-                <a href="{{url_for('logout')}}"><h1>Taskify!</h1></a>
+                <h1>Taskify!</h1>
             </div>
             <nav>
                 <ul>
@@ -29,7 +28,7 @@
                         <a href="{{ url_for('task') }}">Add Tasks</a>
                     </li>
                     <li id="Logout">
-                        <a href="{{ url_for('home') }}">Logout</a>
+                        <a href="{{ url_for('logout') }}">Logout</a>
                     </li>
                 </ul>
             </nav>
@@ -38,53 +37,61 @@
     <main>
         <div class="task-container">
             <h1>Hello {{ first_name }}!</h1>
-            <div id="main container">
+            <div id="main-container">
                 <div id="calendar_sec">
                     <div id="calendar"></div>
                 </div>
-                <div id="description_sec">
-                    <div id="description-bar">
-                        <div class="header">
-                            <div class="header-item" style="float:left; margin-left: 10%">
-                                <span style="background-color:#d15b5b;">Task</span>
-                            </div>
-                            <div class="header-item" style="float:right; margin-right: 10%">
-                                <span>Time</span>
-                            </div>
-                        </div>
+                <div id="tasks-container">
+                    <div class="section">
+                        <h3>Tasks</h3>
+                        <ul id="tasks-list">
+                            {% for task in tasks %}
+                                <li class="task-item"
+                                    data-type="{{ task['type'] }}"
+                                    data-task="{{ task['task'] }}"
+                                    data-start-date="{{ task['dateOfTaskStart'] }}"
+                                    data-start-time="{{ task['timeOfTaskStart'] }}"
+                                    data-end-date="{{ task['dateOfTaskEnd'] }}"
+                                    data-end-time="{{ task['timeOfTaskEnd'] }}"
+                                    data-due-date="{{ task['dueDate'] }}"
+                                    data-due-time="{{ task['dueTime'] }}"
+                                    data-dedicated-to="{{ task['assigned_users'] }}"
+                                    data-description="{{ task['descript'] }}"
+                                    data-completion-date="{{ task['completion_date'] }}">
+                                    <input type="checkbox" id="task{{ task['TID'] }}" name="task{{ task['TID'] }}" value="{{ task['TID'] }}" {% if task['completed'] %} checked {% endif %} onclick="completeTask({{ task['TID'] }})">
+                                    <label>{{ task['task'] }}</label>
+                                    <button class="delete-button1" onclick="deleteTask({{ task['TID'] }})">✖</button>
+                                </li>
+                            {% endfor %}
+                        </ul>
                     </div>
                 </div>
             </div>
-            <div class="section">
-                <h3>Tasks</h3>
-                <ul id="tasks-list">
-                    {% for task in tasks %}
-                        <li class="task-item"
-                            data-task="{{ task['task'] }}"
-                            data-start-date="{{ task['dateOfTaskStart'] }}"
-                            data-start-time="{{ task['timeOfTaskStart'] }}"
-                            data-end-date="{{ task['dateOfTaskEnd'] }}"
-                            data-end-time="{{ task['timeOfTaskEnd'] }}"
-                            data-dedicated-to="{{ task['assigned_users'] }}"
-                            data-description="{{ task['descript'] }}">
-                            <input type="checkbox" id="task{{ task['TID'] }}" name="task{{ task['TID'] }}" value="{{ task['TID'] }}" {% if task['completed'] %} checked {% endif %} onclick="completeTask({{ task['TID'] }})">
-                            <label>{{ task['task'] }}</label>
-                            <button class="delete-button" onclick="deleteTask({{ task['TID'] }})">✖</button>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
-            <div class="task-details" id="task-details">
-                <h2>Task Details</h2>
-                <p><strong>Task:</strong> <span id="details-task"></span></p>
-                <p><strong>Start Date:</strong> <span id="details-start-date"></span></p>
-                <p><strong>Start Time:</strong> <span id="details-start-time"></span></p>
-                <p><strong>End Date:</strong> <span id="details-end-date"></span></p>
-                <p><strong>End Time:</strong> <span id="details-end-time"></span></p>
-                <p><strong>Assigned To:</strong> <span id="details-dedicated-to"></span></p>
-                <p><strong>Description:</strong> <span id="details-description"></span></p>
+            
+            <!-- Task Details Modal -->
+            <div id="modal-overlay"></div>
+                <div id="task-details-modal">
+                    <h2>Task Details</h2>
+                    <p><strong>Task:</strong> <span id="details-task"></span></p>
+                    <p id="details-due-date-time" style="display: none;"><strong>Due:</strong> <span id="details-due-date"></span> at <span id="details-due-time"></span></p>
+                    <p id="details-start-date-time" style="display: none;"><strong>Starts:</strong> <span id="details-start-date"></span> at <span id="details-start-time"></span></p>
+                    <p id="details-end-date-time" style="display: none;"><strong>Ends:</strong> <span id="details-end-date"></span> at <span id="details-end-time"></span></p>
+                    <p><strong>Assigned To:</strong> <span id="details-dedicated-to"></span></p>
+                    <p><strong>Description:</strong> <span id="details-description"></span></p>
+                    <button onclick="closeModal()">Close</button>
+                </div>
             </div>
         </div>
     </main>
+    <a href="{{ url_for('discussion_board') }}" id="fixed-round-button">
+        <img src="{{ url_for('static', filename='images/chat.png') }}" alt="Button Image">
+    </a>
+    <script>
+        var events = {{ events | tojson }};
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendar = new Calendar('#calendar', events);
+        });
+    </script>
+    <script src="{{ url_for('static', filename='idex.js') }}" defer></script>
 </body>
 </html>

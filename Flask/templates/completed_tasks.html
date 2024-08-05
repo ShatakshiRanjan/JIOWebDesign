@@ -39,12 +39,15 @@
             <h3>Tasks</h3>
             <ul id="tasks-list">
                 {% for task in tasks %}
-                    <li class="task-item"
+                    <li class="task-item-c"
+                        data-type="{{ task['type'] }}"
                         data-task="{{ task['task'] }}"
                         data-start-date="{{ task['dateOfTaskStart'] }}"
                         data-start-time="{{ task['timeOfTaskStart'] }}"
                         data-end-date="{{ task['dateOfTaskEnd'] }}"
                         data-end-time="{{ task['timeOfTaskEnd'] }}"
+                        data-due-date="{{ task['dueDate'] }}"
+                        data-due-time="{{ task['dueTime'] }}"
                         data-dedicated-to="{{ task['assigned_users'] }}"
                         data-description="{{ task['descript'] }}"
                         data-completion-date="{{ task['completion_date'] }}">
@@ -58,10 +61,9 @@
         <div class="task-details" id="task-details">
             <h2>Task Details</h2>
             <p><strong>Task:</strong> <span id="details-task"></span></p>
-            <p><strong>Start Date:</strong> <span id="details-start-date"></span></p>
-            <p><strong>Start Time:</strong> <span id="details-start-time"></span></p>
-            <p><strong>End Date:</strong> <span id="details-end-date"></span></p>
-            <p><strong>End Time:</strong> <span id="details-end-time"></span></p>
+            <p id="details-due-date-time" style="display: none;"><strong>Due:</strong> <span id="details-due-date"></span> at <span id="details-due-time"></span></p>
+            <p id="details-start-date-time" style="display: none;"><strong>Starts:</strong> <span id="details-start-date"></span> at <span id="details-start-time"></span></p>
+            <p id="details-end-date-time" style="display: none;"><strong>Ends:</strong> <span id="details-end-date"></span> at <span id="details-end-time"></span></p>
             <p><strong>Completion:</strong> <span id="details-completion-date"></span></p>
             <p><strong>Assigned To:</strong> <span id="details-dedicated-to"></span></p>
             <p><strong>Description:</strong> <span id="details-description"></span></p>
