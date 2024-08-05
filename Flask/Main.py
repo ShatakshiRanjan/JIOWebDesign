@@ -110,23 +110,33 @@ def nextpage():
     """, (user_id,))
     tasks = cursor.fetchall()
 
-    # Convert timedelta objects to strings
-    for task in tasks:
-        if isinstance(task['dateOfTaskStart'], timedelta):
-            task['dateOfTaskStart'] = str(task['dateOfTaskStart'])
-        if isinstance(task['dateOfTaskEnd'], timedelta):
-            task['dateOfTaskEnd'] = str(task['dateOfTaskEnd'])
-        if isinstance(task['dueDate'], timedelta):
-            task['dueDate'] = str(task['dueDate'])
-        if isinstance(task['dueTime'], timedelta):
-            task['dueTime'] = str(task['dueTime'])
-
     cursor.close()
 
+    # Convert tasks into the format expected by the calendar script
+    events = []
+    for task in tasks:
+        if task['type'] == 'task':
+            start_date = task['dateOfTaskStart']
+            events.append({
+                'eventName': task['task'],
+                'calendar': task['project_name'],
+                'date': start_date.isoformat() if start_date else None,
+                'color': 'orange'  # Customize color as needed
+            })
+        elif task['type'] == 'event':
+            due_date = task['dueDate']
+            events.append({
+                'eventName': task['task'],
+                'calendar': task['project_name'],
+                'date': due_date.isoformat() if due_date else None,
+                'color': 'blue'  # Customize color as needed
+            })
+
     if first_name:
-        return render_template('dashboard.html', first_name=first_name, tasks=tasks)
+        return render_template('dashboard.html', first_name=first_name, events=events)
 
     return redirect(url_for('login'))
+
 
 @app.route('/task')
 def task():
