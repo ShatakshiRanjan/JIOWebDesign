@@ -9,7 +9,7 @@ body{
 #main-container {
     display: flex;
     justify-content: space-between;
-    padding: 1%;
+    padding: 2%;
 }
 
 #tasks-container {
@@ -88,6 +88,14 @@ body{
     margin-left: 10px;
 }
 .task-item input[type="checkbox"] {
+    margin-left: 10px;
+}
+
+.task-item-c label {
+    flex-grow: 1;
+    margin-left: 10px;
+}
+.task-item-c input[type="checkbox"] {
     margin-left: 10px;
 }
 
