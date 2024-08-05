@@ -123,12 +123,6 @@ header{
     }
 } 
 
-header a{
-    color:#ffffff;
-    text-decoration:none;
-    text-transform: uppercase;
-    font-size: 16px;
-}
 
 header li{
     float:left;
@@ -136,7 +130,7 @@ header li{
     padding:0 20px 0 20px;
 }
 
-header #brand{
+header #brand a{
     margin-left: 0px;
     text-align: left;
     padding-left: 10px;
@@ -144,6 +138,7 @@ header #brand{
     position:absolute;
     background-color: rgb(133, 35, 0);
     border-radius: 20px;
+    text-decoration: none;
 }
 
 header #brand h1{
@@ -156,12 +151,19 @@ header nav{
     margin-top: 10px;
 }
 
-header .current a{
+header nav a{
+    color:#ffffff;
+    text-decoration:none;
+    text-transform: uppercase;
+    font-size: 16px;
+}
+
+header nav .current a{
     color:rgb(231, 180, 51);
     font-weight: bold;
 }
 
-header a:hover{
+header nav a:hover{
     color:#cccccc;
     font-weight:bold;
     font-size: 18px;
