@@ -1,35 +1,102 @@
 document.querySelectorAll('.task-item').forEach(item => {
-    item.addEventListener('mouseover', event => {
+    item.addEventListener('click', event => {
         const taskDetails = event.currentTarget.dataset;
 
         const formatDate = (dateString) => {
+            if (!dateString) return 'N/A';
             const options = { year: 'numeric', month: 'long', day: 'numeric' };
             const date = new Date(dateString);
             return date.toLocaleDateString(undefined, options);
         };
 
         const formatTime = (timeString) => {
+            if (!timeString) return 'N/A';
             const [hours, minutes] = timeString.split(':').map(Number);
             const date = new Date();
             date.setHours(hours, minutes);
             return date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', hour12: false });
         };
 
-        const formatDateTime = (dateTimeString) => {
-            const [date, time] = dateTimeString.split(' ');
-            return `${formatDate(date)} at ${formatTime(time)}`;
-        };
+        const taskType = taskDetails.type;
 
         document.getElementById('details-task').textContent = taskDetails.task;
-        document.getElementById('details-start-date').textContent = formatDate(taskDetails.startDate);
-        document.getElementById('details-start-time').textContent = formatTime(taskDetails.startTime);
-        document.getElementById('details-end-date').textContent = formatDate(taskDetails.endDate);
-        document.getElementById('details-end-time').textContent = formatTime(taskDetails.endTime);
         document.getElementById('details-dedicated-to').textContent = taskDetails.dedicatedTo;
         document.getElementById('details-description').textContent = taskDetails.description;
-        document.getElementById('details-completion-date').textContent = formatDateTime(taskDetails.completionDate);
+
+        if (taskType === 'event') {
+            document.getElementById('details-due-date-time').style.display = 'block';
+            document.getElementById('details-start-date-time').style.display = 'none';
+            document.getElementById('details-end-date-time').style.display = 'none';
+            document.getElementById('details-due-date').textContent = formatDate(taskDetails.dueDate);
+            document.getElementById('details-due-time').textContent = formatTime(taskDetails.dueTime);
+        } else if (taskType === 'task') {
+            document.getElementById('details-due-date-time').style.display = 'none';
+            document.getElementById('details-start-date-time').style.display = 'block';
+            document.getElementById('details-end-date-time').style.display = 'block';
+            document.getElementById('details-start-date').textContent = formatDate(taskDetails.startDate);
+            document.getElementById('details-start-time').textContent = formatTime(taskDetails.startTime);
+            document.getElementById('details-end-date').textContent = formatDate(taskDetails.endDate);
+            document.getElementById('details-end-time').textContent = formatTime(taskDetails.endTime);
+        }
+
+        openModal();
     });
 });
+
+document.querySelectorAll('.task-item-c').forEach(item => {
+    item.addEventListener('click', event => {
+        const taskDetails = event.currentTarget.dataset;
+
+        const formatDate = (dateString) => {
+            if (!dateString) return 'N/A';
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            const date = new Date(dateString);
+            return date.toLocaleDateString(undefined, options);
+        };
+
+        const formatTime = (timeString) => {
+            if (!timeString) return 'N/A';
+            const [hours, minutes] = timeString.split(':').map(Number);
+            const date = new Date();
+            date.setHours(hours, minutes);
+            return date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', hour12: false });
+        };
+
+        const taskType = taskDetails.type;
+
+        document.getElementById('details-task').textContent = taskDetails.task;
+        document.getElementById('details-dedicated-to').textContent = taskDetails.dedicatedTo;
+        document.getElementById('details-description').textContent = taskDetails.description;
+        document.getElementById('details-completion-date').textContent = formatDate(taskDetails.completionDate);
+        if (taskType === 'event') {
+            document.getElementById('details-due-date-time').style.display = 'block';
+            document.getElementById('details-start-date-time').style.display = 'none';
+            document.getElementById('details-end-date-time').style.display = 'none';
+            document.getElementById('details-due-date').textContent = formatDate(taskDetails.dueDate);
+            document.getElementById('details-due-time').textContent = formatTime(taskDetails.dueTime);
+        } else if (taskType === 'task') {
+            document.getElementById('details-due-date-time').style.display = 'none';
+            document.getElementById('details-start-date-time').style.display = 'block';
+            document.getElementById('details-end-date-time').style.display = 'block';
+            document.getElementById('details-start-date').textContent = formatDate(taskDetails.startDate);
+            document.getElementById('details-start-time').textContent = formatTime(taskDetails.startTime);
+            document.getElementById('details-end-date').textContent = formatDate(taskDetails.endDate);
+            document.getElementById('details-end-time').textContent = formatTime(taskDetails.endTime);
+        }
+
+        openModal();
+    });
+});
+
+function openModal() {
+    document.getElementById('task-details-modal').style.display = 'block';
+    document.getElementById('modal-overlay').style.display = 'block';
+}
+
+function closeModal() {
+    document.getElementById('task-details-modal').style.display = 'none';
+    document.getElementById('modal-overlay').style.display = 'none';
+}
 
 function completeTask(taskId) {
     fetch('/complete_task', {
@@ -119,22 +186,13 @@ function deleteTask(taskId) {
     });
 }
 
-document.querySelectorAll('.delete-button').forEach(button => {
+document.querySelectorAll('.delete-button1').forEach(button => {
     button.addEventListener('click', event => {
         event.stopPropagation();
         const taskId = event.currentTarget.parentElement.querySelector('input[type="checkbox"]').value;
         deleteTask(taskId);
     });
 });
-
-window.onload = function() {
-    if (!sessionStorage.getItem('reloaded')) {
-        sessionStorage.setItem('reloaded', 'yes');
-        window.location.reload();
-    } else {
-        sessionStorage.removeItem('reloaded');
-    }
-};
 
 function deletePost(postId) {
     fetch('/delete_post', {
@@ -171,7 +229,8 @@ document.querySelectorAll('.delete-button').forEach(button => {
 });
 
 function confirmDelete(postId) {
-    if (confirm('Are you sure you want to delete this post?')) {
+    if (confirm('Please confirm deletion.')) {
         deletePost(postId);
     }
 }
+

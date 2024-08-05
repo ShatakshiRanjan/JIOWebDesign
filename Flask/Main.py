@@ -3,7 +3,7 @@ from flask_mysqldb import MySQL
 import MySQLdb.cursors
 import hashlib
 import os
-import datetime
+from datetime import timedelta
 from apscheduler.schedulers.background import BackgroundScheduler
 import config
 
@@ -60,10 +60,6 @@ def login():
         email = request.form.get("email")
         password = request.form.get("password")
         
-        if email == "admin@mail.com" and password == "admin":
-            session["user_id"] = "admin"
-            return redirect(url_for("nextpage"))
-        
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
         
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -96,34 +92,133 @@ def nextpage():
         return redirect(url_for('login'))
 
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    
-    if user_id == "admin":
-        first_name = "admin"
-        tasks = []
-    else:
-        cursor.execute("SELECT first_name FROM users WHERE id = %s", (user_id,))
-        user = cursor.fetchone()
-        first_name = user['first_name'] if user else None
 
-        cursor.execute("""
-            SELECT tasks.TID, tasks.task, tasks.dateOfTaskStart, tasks.timeOfTaskStart, tasks.dateOfTaskEnd, tasks.timeOfTaskEnd, tasks.descript,
-                   GROUP_CONCAT(CONCAT(users.first_name, ' ', users.last_name) SEPARATOR ', ') AS assigned_users
-            FROM tasks
-            JOIN task_assignments ON tasks.TID = task_assignments.task_id
-            JOIN users ON task_assignments.user_id = users.id
-            WHERE tasks.completed = FALSE AND tasks.TID IN (
-                SELECT task_id FROM task_assignments WHERE user_id = %s
-            )
-            GROUP BY tasks.TID
-        """, (user_id,))
-        tasks = cursor.fetchall()
+    # Fetch user first name
+    cursor.execute("SELECT first_name FROM users WHERE id = %s", (user_id,))
+    user = cursor.fetchone()
+    first_name = user['first_name'] if user else None
+
+    # Fetch tasks assigned to the user
+    cursor.execute("""
+        SELECT tasks.TID, tasks.task, tasks.type, tasks.dateOfTaskStart, tasks.timeOfTaskStart, tasks.dateOfTaskEnd, tasks.timeOfTaskEnd,
+            tasks.dueDate, tasks.dueTime, tasks.descript, projects.name as project_name,
+            GROUP_CONCAT(CONCAT(users.first_name, ' ', users.last_name) SEPARATOR ', ') AS assigned_users
+        FROM tasks
+        JOIN task_assignments ON tasks.TID = task_assignments.task_id
+        JOIN users ON task_assignments.user_id = users.id
+        JOIN projects ON tasks.project_id = projects.id
+        WHERE tasks.completed = FALSE AND tasks.TID IN (
+            SELECT task_id FROM task_assignments WHERE user_id = %s
+        )
+        GROUP BY tasks.TID
+    """, (user_id,))
+    tasks = cursor.fetchall()
+
+    # Fetch all projects
+    cursor.execute("SELECT id, name FROM projects")
+    projects = cursor.fetchall()
+
+    cursor.close()
+
+    # Convert tasks into the format expected by the calendar script
+    events = []
+    for task in tasks:
+        if task['type'] == 'task':
+            start_date = task['dateOfTaskStart']
+            events.append({
+                'eventName': task['task'],
+                'calendar': task['project_name'],
+                'date': start_date.isoformat() if start_date else None,
+                'color': 'orange'  # Customize color as needed
+            })
+        elif task['type'] == 'event':
+            due_date = task['dueDate']
+            events.append({
+                'eventName': task['task'],
+                'calendar': task['project_name'],
+                'date': due_date.isoformat() if due_date else None,
+                'color': 'blue'  # Customize color as needed
+            })
+
+    if first_name:
+        return render_template('dashboard.html', first_name=first_name, events=events, tasks=tasks, projects=projects)
+
+    return redirect(url_for('login'))
+
+
+
+@app.route('/task')
+def task():
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute("SELECT id, first_name, last_name FROM users")
+    users = cursor.fetchall()
+    
+    cursor.execute("SELECT id, name FROM projects")
+    projects = cursor.fetchall()
     
     cursor.close()
+    return render_template('htmltask.html', users=users, projects=projects)
+
+@app.route('/submit_task', methods=['POST'])
+def submit_task():
+    task_type = request.form['type']
+    user_id = session.get("user_id")
+
+    if task_type == 'project':
+        project_name = request.form['name']
+        project_description = request.form['description']
+        
+        sql_project = """
+            INSERT INTO projects (name, description, user_id)
+            VALUES (%s, %s, %s)
+        """
+        cursor = mysql.connection.cursor()
+        cursor.execute(sql_project, (project_name, project_description, user_id))
+        mysql.connection.commit()
+        cursor.close()
+        
+        return redirect(url_for('task'))
+
+    # Handle task or event creation
+    task_name = request.form['name']
+    description = request.form['description']
+    project_id = request.form['project_id']
+    assigned_to = request.form.getlist('assignedTo[]')
     
-    if first_name:
-        return render_template('dashboard.html', first_name=first_name, tasks=tasks)
+    if task_type == 'task':
+        start_date = request.form.get('startDate') or None
+        start_time = request.form.get('startTime') or None
+        end_date = request.form.get('endDate') or None
+        end_time = request.form.get('endTime') or None
+        
+        sql_task = """
+            INSERT INTO tasks (task, type, dateOfTaskStart, timeOfTaskStart, dateOfTaskEnd, timeOfTaskEnd, descript, user_id, project_id)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        val_task = (task_name, task_type, start_date, start_time, end_date, end_time, description, user_id, project_id)
     
-    return redirect(url_for('login'))
+    elif task_type == 'event':
+        due_date = request.form.get('date') or None
+        due_time = request.form.get('time') or None
+        
+        sql_task = """
+            INSERT INTO tasks (task, type, dueDate, dueTime, descript, user_id, project_id)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+        """
+        val_task = (task_name, task_type, due_date, due_time, description, user_id, project_id)
+    
+    cursor = mysql.connection.cursor()
+    cursor.execute(sql_task, val_task)
+    task_id = cursor.lastrowid
+
+    sql_assignment = "INSERT INTO task_assignments (task_id, user_id) VALUES (%s, %s)"
+    for user_id in assigned_to:
+        cursor.execute(sql_assignment, (task_id, user_id))
+
+    mysql.connection.commit()
+    cursor.close()
+
+    return redirect(url_for('task'))
 
 @app.route('/delete_task', methods=['POST'])
 def delete_task():
@@ -148,41 +243,6 @@ def delete_task():
         print(f"Error deleting task: {e}")
         return jsonify(success=False, message="Database error"), 500
 
-@app.route('/task')
-def task():
-    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cursor.execute("SELECT id, first_name, last_name FROM users")
-    users = cursor.fetchall()
-    cursor.close()
-    return render_template('htmltask.html', users=users)
-
-@app.route('/submit_task', methods=['POST'])
-def submit_task():
-    task = request.form['task']
-    dateOfTaskStart = request.form['dateOfTaskStart']
-    timeOfTaskStart = request.form['timeOfTaskStart']
-    dateOfTaskEnd = request.form['dateOfTaskEnd']
-    timeOfTaskEnd = request.form['timeOfTaskEnd']
-    dedicatedTo = request.form.getlist('dedicatedTo[]')
-    descript = request.form['descript']
-    user_id = session.get("user_id")
-
-    sql_task = "INSERT INTO tasks (task, dateOfTaskStart, timeOfTaskStart, dateOfTaskEnd, timeOfTaskEnd, descript, user_id) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-    val_task = (task, dateOfTaskStart, timeOfTaskStart, dateOfTaskEnd, timeOfTaskEnd, descript, user_id)
-
-    cursor = mysql.connection.cursor()
-    cursor.execute(sql_task, val_task)
-    task_id = cursor.lastrowid
-
-    sql_assignment = "INSERT INTO task_assignments (task_id, user_id) VALUES (%s, %s)"
-    for user_id in dedicatedTo:
-        cursor.execute(sql_assignment, (task_id, user_id))
-    
-    mysql.connection.commit()
-    cursor.close()
-
-    return redirect(url_for('task'))
-
 @app.route('/complete_task', methods=['POST'])
 def complete_task():
     user_id = session.get("user_id")
@@ -205,11 +265,13 @@ def completed_tasks():
 
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute("""
-        SELECT tasks.TID, tasks.task, tasks.dateOfTaskStart, tasks.timeOfTaskStart, tasks.dateOfTaskEnd, tasks.timeOfTaskEnd, tasks.descript, tasks.completion_date,
+        SELECT tasks.TID, tasks.task, tasks.type, tasks.dateOfTaskStart, tasks.timeOfTaskStart, tasks.dateOfTaskEnd, tasks.timeOfTaskEnd,
+               tasks.dueDate, tasks.dueTime, tasks.descript, tasks.completion_date, projects.name as project_name,
                GROUP_CONCAT(CONCAT(users.first_name, ' ', users.last_name) SEPARATOR ', ') AS assigned_users
         FROM tasks
         JOIN task_assignments ON tasks.TID = task_assignments.task_id
         JOIN users ON task_assignments.user_id = users.id
+        JOIN projects ON tasks.project_id = projects.id
         WHERE tasks.completed = TRUE AND tasks.TID IN (
             SELECT task_id FROM task_assignments WHERE user_id = %s
         )
