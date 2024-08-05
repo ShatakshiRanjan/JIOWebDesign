@@ -91,10 +91,12 @@ def nextpage():
 
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
 
+    # Fetch user first name
     cursor.execute("SELECT first_name FROM users WHERE id = %s", (user_id,))
     user = cursor.fetchone()
     first_name = user['first_name'] if user else None
 
+    # Fetch tasks assigned to the user
     cursor.execute("""
         SELECT tasks.TID, tasks.task, tasks.type, tasks.dateOfTaskStart, tasks.timeOfTaskStart, tasks.dateOfTaskEnd, tasks.timeOfTaskEnd,
             tasks.dueDate, tasks.dueTime, tasks.descript, projects.name as project_name,
@@ -109,6 +111,10 @@ def nextpage():
         GROUP BY tasks.TID
     """, (user_id,))
     tasks = cursor.fetchall()
+
+    # Fetch all projects
+    cursor.execute("SELECT id, name FROM projects")
+    projects = cursor.fetchall()
 
     cursor.close()
 
@@ -133,9 +139,10 @@ def nextpage():
             })
 
     if first_name:
-        return render_template('dashboard.html', first_name=first_name, events=events, tasks=tasks)
+        return render_template('dashboard.html', first_name=first_name, events=events, tasks=tasks, projects=projects)
 
     return redirect(url_for('login'))
+
 
 
 @app.route('/task')
