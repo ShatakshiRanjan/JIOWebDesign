@@ -133,7 +133,7 @@ def nextpage():
             })
 
     if first_name:
-        return render_template('dashboard.html', first_name=first_name, events=events)
+        return render_template('dashboard.html', first_name=first_name, events=events, tasks=tasks)
 
     return redirect(url_for('login'))
 
