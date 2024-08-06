@@ -21,20 +21,38 @@
         <small>By {{ post.first_name }} {{ post.last_name }} on {{ post.created_at }}</small>
     </div>
     <h2>Comments</h2>
+    {% if archeived_check == 0 %}
     <form method="POST">
         <textarea name="body" placeholder="Write your comment here..." required></textarea><br>
         <button class="sub-button" type="submit">Submit</button>
     </form>
+    {% endif %}
 
     <div id="comments">
-        {% for comment in comments %}
-        <div class="comment">
-            <p>{{ comment.body }}</p>
-            <small>By {{ comment.first_name }} {{ comment.last_name }} on {{ comment.created_at }}</small>
+        {% if comments|length == 0 %}
+        <div style="text-align: center;">
+            <div class="comment" style="background-color: rgb(41, 96, 192); color:gold; ">
+                <p style="font-weight: 100; font-size: large; padding:0; margin:4px">No comments yet</p>
+            </div>
         </div>
-        {% endfor %}
+        {% else %}
+            {% for comment in comments %}
+            <div class="comment">
+                <p>{{ comment.body }}</p>
+                <small>By {{ comment.first_name }} {{ comment.last_name }} on {{ comment.created_at }}</small>
+            </div>
+            {% endfor %}
+        {% endif %}
     </div>
-    <button onclick="window.location.href='{{ url_for('discussion_board') }}';" id="back-button">Back to Discussion Board</button>
+    {% if comments.archieved == 0 %}
+    <div style="text-align: center;">
+        <button class="new-button" onclick="window.location.href='{{ url_for('discussion_board') }}';" id="back-button" style="width: 90%">Back to Discussion Board</button>
+    </div>
+    {% else %}
+    <div style="text-align: center;">
+        <button class="new-button" onclick="window.location.href='{{ url_for('archieved_posts') }}';" id="back-button" style="width: 90%">Back to Archieved Posts</button>
+    </div>
+    {% endif %}
     <a href="{{ url_for('nextpage') }}" id="fixed-round-button">
         <img src="{{ url_for('static', filename='images/to-do.png') }}" alt="Button Image">
     </a>
