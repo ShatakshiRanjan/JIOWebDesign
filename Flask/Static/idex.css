@@ -3,7 +3,7 @@ body{
     padding:0;
     margin:0 0 0 0;
     height:100%;
-    margin: 0%;
+    margin: 3%;
     overflow: hidden;
 }
 #main-container {
@@ -29,13 +29,14 @@ body{
     width: 50%;
     padding: 20px;
     background-color: white;
-    border-radius: 5px;
+    border-radius: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     z-index: 1000;
 }
 
 #task-details-modal h2 {
     margin-top: 0;
+    text-align: center;
 }
 
 #modal-overlay {
@@ -125,7 +126,6 @@ body{
 }
 
 /* Chat Button */ 
-
 #fixed-round-button {
     position: fixed;
     bottom: 20px;

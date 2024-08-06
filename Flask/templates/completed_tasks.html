@@ -33,7 +33,7 @@
             </nav>
         </div>
     </header>
-    <div class="task-container">
+    <div class="tasks-container">
         <h1>Completed Tasks</h1>
         <div class="section">
             <h3>Tasks</h3>
@@ -58,7 +58,9 @@
                 {% endfor %}
             </ul>
         </div>
-        <div class="task-details" id="task-details">
+        <!-- Task Details Modal -->
+        <div id="modal-overlay"></div>
+        <div id="task-details-modal">
             <h2>Task Details</h2>
             <p><strong>Task:</strong> <span id="details-task"></span></p>
             <p id="details-due-date-time" style="display: none;"><strong>Due:</strong> <span id="details-due-date"></span> at <span id="details-due-time"></span></p>
@@ -67,10 +69,12 @@
             <p><strong>Completion:</strong> <span id="details-completion-date"></span></p>
             <p><strong>Assigned To:</strong> <span id="details-dedicated-to"></span></p>
             <p><strong>Description:</strong> <span id="details-description"></span></p>
+            <button onclick="closeModal()">Close</button>
         </div>
         <a href="{{ url_for('discussion_board') }}" id="fixed-round-button">
             <img src="{{ url_for('static', filename='images/chat.png') }}" alt="Button Image">
         </a>
     </div>
+    <script src="{{ url_for('static', filename='idex.js') }}" defer></script>
 </body>
 </html>
