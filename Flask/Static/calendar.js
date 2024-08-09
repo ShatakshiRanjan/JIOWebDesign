@@ -131,7 +131,7 @@
         outer.appendChild(events);
         this.week.appendChild(outer);
     }
-    
+
     Calendar.prototype.drawEvents = function(day, element) {
         var todaysEvents = this.events.filter(function(ev) {
             return ev.date.isSame(day, 'day');
@@ -155,11 +155,21 @@
     }
 
     Calendar.prototype.openDay = function(el) {
-        var details, arrow;
         var dayNumber = +el.querySelectorAll('.day-number')[0].innerText || +el.querySelectorAll('.day-number')[0].textContent;
         var day = this.current.clone().date(dayNumber);
-
+        
         var currentOpened = document.querySelector('.details');
+
+        // If the same day is clicked again, close the details
+        if (currentOpened && currentOpened.getAttribute('data-date') === day.format('YYYY-MM-DD')) {
+            currentOpened.addEventListener('animationend', function() {
+                currentOpened.parentNode.removeChild(currentOpened);
+            });
+            currentOpened.className = 'details out';
+            return;
+        }
+
+        // Remove any existing details
         if (currentOpened) {
             currentOpened.addEventListener('animationend', function() {
                 currentOpened.parentNode.removeChild(currentOpened);
@@ -167,8 +177,11 @@
             currentOpened.className = 'details out';
         }
 
-        details = createElement('div', 'details in');
-        arrow = createElement('div', 'arrow');
+        // Create new details element
+        var details = createElement('div', 'details in');
+        details.setAttribute('data-date', day.format('YYYY-MM-DD'));
+        
+        var arrow = createElement('div', 'arrow');
         details.appendChild(arrow);
         el.parentNode.appendChild(details);
 
