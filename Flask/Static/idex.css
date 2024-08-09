@@ -106,7 +106,7 @@ body {
 }
 
 /* Delete buttons */
-.delete-button, .delete-button1 {
+.delete-button, .delete-button1, .delete-project-button {
     background: none;
     border: none;
     color: red;
@@ -114,7 +114,7 @@ body {
     cursor: pointer;
 }
 
-.delete-button:hover, .delete-button1:hover {
+.delete-button:hover, .delete-button1:hover, .delete-project-button:hover {
     color: darkred;
 }
 
@@ -196,7 +196,7 @@ body {
     background-color: #f0f0f0;
 }
 
-#project-modal button {
+/* #project-modal button {
     display: block;
     margin: 20px auto 0;
     padding: 10px 20px;
@@ -209,7 +209,7 @@ body {
 
 #project-modal button:hover {
     background-color: #0056b3;
-}
+} */
 
 #project-modal-overlay {
     display: none;
@@ -221,3 +221,6 @@ body {
     background: rgba(0, 0, 0, 0.5);
     z-index: 999;
 }
+
+
+

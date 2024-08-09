@@ -145,6 +145,33 @@ def nextpage():
 
     return redirect(url_for('login'))
 
+@app.route('/delete_project', methods=['POST'])
+def delete_project():
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"success": False, "message": "User not authenticated"})
+
+    data = request.get_json()
+    project_id = data.get('project_id')
+
+    if not project_id:
+        return jsonify({"success": False, "message": "Invalid project ID"})
+
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+    try:
+        # Delete all tasks and events associated with the project
+        cursor.execute("DELETE FROM task_assignments WHERE task_id IN (SELECT TID FROM tasks WHERE project_id = %s)", (project_id,))
+        cursor.execute("DELETE FROM tasks WHERE project_id = %s", (project_id,))
+        # Delete the project itself
+        cursor.execute("DELETE FROM projects WHERE id = %s", (project_id,))
+        mysql.connection.commit()
+        cursor.close()
+        return jsonify({"success": True})
+    except Exception as e:
+        mysql.connection.rollback()
+        cursor.close()
+        return jsonify({"success": False, "message": str(e)})
 
 
 @app.route('/task')

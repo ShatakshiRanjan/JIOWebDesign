@@ -85,17 +85,22 @@
         </div>
     </main>
     
-    <!-- Project Modal -->
     <div id="project-modal-overlay"></div>
     <div id="project-modal">
         <h2>Projects</h2>
         <ul>
             {% for project in projects %}
-                <li>{{ project.name }}</li>
+                <li>
+                    {{ project.name }}
+                    {% if project.name != "General" %}
+                        <button class="delete-project-button" data-project-id="{{ project.id }}">✖</button>
+                    {% endif %}
+                </li>
             {% endfor %}
         </ul>
         <button onclick="closeProjectModal()">Close</button>
     </div>
+    
     
     <a href="{{ url_for('discussion_board') }}" id="fixed-round-button">
         <img src="{{ url_for('static', filename='images/chat.png') }}" alt="Button Image">
