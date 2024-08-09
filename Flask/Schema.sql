@@ -96,6 +96,7 @@ USE `Taskify`;
 -- 	   FOREIGN KEY (archieved_id) REFERENCES archieved_posts(id)
 -- );
 
+-- call taskify.archieving_posts();
 select * from posts;
 select * from comments;
 select * from task_assignments;

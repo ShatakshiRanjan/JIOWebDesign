@@ -131,7 +131,7 @@
         outer.appendChild(events);
         this.week.appendChild(outer);
     }
-    
+
     Calendar.prototype.drawEvents = function(day, element) {
         var todaysEvents = this.events.filter(function(ev) {
             return ev.date.isSame(day, 'day');
@@ -155,11 +155,21 @@
     }
 
     Calendar.prototype.openDay = function(el) {
-        var details, arrow;
         var dayNumber = +el.querySelectorAll('.day-number')[0].innerText || +el.querySelectorAll('.day-number')[0].textContent;
         var day = this.current.clone().date(dayNumber);
-
+        
         var currentOpened = document.querySelector('.details');
+
+        // If the same day is clicked again, close the details
+        if (currentOpened && currentOpened.getAttribute('data-date') === day.format('YYYY-MM-DD')) {
+            currentOpened.addEventListener('animationend', function() {
+                currentOpened.parentNode.removeChild(currentOpened);
+            });
+            currentOpened.className = 'details out';
+            return;
+        }
+
+        // Remove any existing details
         if (currentOpened) {
             currentOpened.addEventListener('animationend', function() {
                 currentOpened.parentNode.removeChild(currentOpened);
@@ -167,8 +177,11 @@
             currentOpened.className = 'details out';
         }
 
-        details = createElement('div', 'details in');
-        arrow = createElement('div', 'arrow');
+        // Create new details element
+        var details = createElement('div', 'details in');
+        details.setAttribute('data-date', day.format('YYYY-MM-DD'));
+        
+        var arrow = createElement('div', 'arrow');
         details.appendChild(arrow);
         el.parentNode.appendChild(details);
 
@@ -177,7 +190,7 @@
         });
 
         this.renderEvents(todaysEvents, details);
-        arrow.style.left = el.offsetLeft - el.parentNode.offsetLeft + 38 + 'px';
+        arrow.style.left = el.offsetLeft - el.parentNode.offsetLeft + 45 + 'px';
     }
 
     Calendar.prototype.renderEvents = function(events, ele) {
@@ -214,18 +227,18 @@
 
     Calendar.prototype.drawLegend = function() {
         var legend = createElement('div', 'legend');
-        var calendars = this.events.map(function(e) {
-            return e.calendar + '|' + e.color;
-        }).reduce(function(memo, e) {
-            if (memo.indexOf(e) === -1) {
-                memo.push(e);
+        var calendars = this.events.reduce(function(memo, e) {
+            if (!memo[e.calendar]) {
+                memo[e.calendar] = e.color;
             }
             return memo;
-        }, []).forEach(function(e) {
-            var parts = e.split('|');
-            var entry = createElement('span', 'entry ' + parts[1], parts[0]);
+        }, {});
+
+        for (var key in calendars) {
+            var entry = createElement('span', 'entry ' + calendars[key], key);
             legend.appendChild(entry);
-        });
+        }
+
         this.el.appendChild(legend);
     }
 

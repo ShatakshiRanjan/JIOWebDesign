@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='idex.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="{{ url_for('static', filename='moment.min.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='idex.js') }}" defer></script>
     <script src="{{ url_for('static', filename='calendar.js') }}" defer></script>
     <title>Dashboard</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='Images/favicon.ico') }}">
@@ -37,6 +38,7 @@
     <main>
         <div class="task-container">
             <h1>Hello, {{ first_name }}</h1>
+            <button id="project-button">Projects</button>
             <div id="main-container">
                 <div id="calendar_sec">
                     <div id="calendar"></div>
@@ -67,22 +69,39 @@
                     </div>
                 </div>
             </div>
-            
+    
             <!-- Task Details Modal -->
             <div id="modal-overlay"></div>
-                <div id="task-details-modal">
-                    <h2>Task Details</h2>
-                    <p><strong>Task:</strong> <span id="details-task"></span></p>
-                    <p id="details-due-date-time" style="display: none;"><strong>Due:</strong> <span id="details-due-date"></span> at <span id="details-due-time"></span></p>
-                    <p id="details-start-date-time" style="display: none;"><strong>Starts:</strong> <span id="details-start-date"></span> at <span id="details-start-time"></span></p>
-                    <p id="details-end-date-time" style="display: none;"><strong>Ends:</strong> <span id="details-end-date"></span> at <span id="details-end-time"></span></p>
-                    <p><strong>Assigned To:</strong> <span id="details-dedicated-to"></span></p>
-                    <p><strong>Description:</strong> <span id="details-description"></span></p>
-                    <button onclick="closeModal()">Close</button>
-                </div>
+            <div id="task-details-modal">
+                <h2>Task Details</h2>
+                <p><strong>Task:</strong> <span id="details-task"></span></p>
+                <p id="details-due-date-time" style="display: none;"><strong>Due:</strong> <span id="details-due-date"></span> at <span id="details-due-time"></span></p>
+                <p id="details-start-date-time" style="display: none;"><strong>Starts:</strong> <span id="details-start-date"></span> at <span id="details-start-time"></span></p>
+                <p id="details-end-date-time" style="display: none;"><strong>Ends:</strong> <span id="details-end-date"></span> at <span id="details-end-time"></span></p>
+                <p><strong>Assigned To:</strong> <span id="details-dedicated-to"></span></p>
+                <p><strong>Description:</strong> <span id="details-description"></span></p>
+                <button onclick="closeModal()">Close</button>
             </div>
         </div>
     </main>
+    
+    <div id="project-modal-overlay"></div>
+    <div id="project-modal">
+        <h2>Projects</h2>
+        <ul>
+            {% for project in projects %}
+                <li>
+                    {{ project.name }}
+                    {% if project.name != "General" %}
+                        <button class="delete-project-button" data-project-id="{{ project.id }}">✖</button>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+        <button onclick="closeProjectModal()">Close</button>
+    </div>
+    
+    
     <a href="{{ url_for('activePages.discussion_board') }}" id="fixed-round-button">
         <img src="{{ url_for('static', filename='images/chat.png') }}" alt="Button Image">
     </a>
@@ -91,7 +110,17 @@
         document.addEventListener('DOMContentLoaded', function() {
             var calendar = new Calendar('#calendar', events);
         });
+    
+        document.getElementById('project-button').addEventListener('click', function() {
+            document.getElementById('project-modal').style.display = 'block';
+            document.getElementById('project-modal-overlay').style.display = 'block';
+        });
+    
+        function closeProjectModal() {
+            document.getElementById('project-modal').style.display = 'none';
+            document.getElementById('project-modal-overlay').style.display = 'none';
+        }
     </script>
-    <script src="{{ url_for('static', filename='idex.js') }}" defer></script>
-</body>
+</body>    
 </html>
+    

@@ -234,3 +234,42 @@ function confirmDelete(postId) {
     }
 }
 
+document.querySelectorAll('.delete-project-button').forEach(button => {
+    button.addEventListener('click', event => {
+        event.stopPropagation();
+        const projectId = event.currentTarget.dataset.projectId;
+        confirmDeleteProject(projectId);
+    });
+});
+
+function confirmDeleteProject(projectId) {
+    if (confirm('Please confirm deletion. All tasks and events in this project will be deleted.')) {
+        deleteProject(projectId);
+    }
+}
+
+function deleteProject(projectId) {
+    fetch('/delete_project', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ project_id: projectId }),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            console.error('Project deletion failed:', data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error deleting project:', error);
+    });
+}
