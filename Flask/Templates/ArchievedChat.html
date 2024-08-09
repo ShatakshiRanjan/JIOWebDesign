@@ -19,13 +19,13 @@
             <nav>
                 <ul>
                     <li id="Dashboard">
-                        <a href="{{ url_for('nextpage') }}">My Tasks</a>
+                        <a href="{{ url_for('activePages.nextpage') }}">My Tasks</a>
                     </li>
                     <li id="Completed_Tasks">
-                        <a href="{{ url_for('completed_tasks') }}">Completed</a>
+                        <a href="{{ url_for('activePages.completed_tasks') }}">Completed</a>
                     </li>
-                    <li id="Add_Tasks" class="current">
-                        <a href="{{ url_for('task') }}">Add Tasks</a>
+                    <li id="Add_Tasks">
+                        <a href="{{ url_for('activePages.task') }}">Add Tasks</a>
                     </li>
                     <li id="Logout">
                         <a href="{{ url_for('logout') }}">Logout</a>
@@ -36,18 +36,18 @@
     </header>
     <main>
         <h1>Archieved Chats</h1>
-        
+
         <div id="posts">
             {% for x in archieved_post %}
             <div class="post">
-                <h2><a style="text-decoration: none; color: black" href="{{ url_for('archieved_post', archieved_id=x.id) }}">{{ x.title }}</a></h2>
+                <h2><a style="text-decoration: none; color: black" href="{{ url_for('activePages.archieved_post', archieved_id=x.id) }}">{{ x.title }}</a></h2>
                 <p>{{ x.body }}</p>
                 <small>By {{ x.first_name }} {{ x.last_name }} on {{ x.created_at }}</small>
                 <!-- <button class="delete-button" onclick="confirmDelete({{ archieved_post.id }})">✖</button> -->
             </div>
             {% endfor %}
         </div>
-        <a href="{{ url_for('nextpage') }}" id="fixed-round-button">
+        <a href="{{ url_for('activePages.nextpage') }}" id="fixed-round-button">
             <img src="{{ url_for('static', filename='images/to-do.png') }}" alt="Button Image">
         </a>
     </main>

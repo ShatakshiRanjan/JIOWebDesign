@@ -105,13 +105,13 @@
             <nav>
                 <ul>
                     <li id="Dashboard">
-                        <a href="{{ url_for('nextpage') }}">My Tasks</a>
+                        <a href="{{ url_for('activePages.nextpage') }}">My Tasks</a>
                     </li>
                     <li id="Completed_Tasks">
-                        <a href="{{ url_for('completed_tasks') }}">Completed</a>
+                        <a href="{{ url_for('activePages.completed_tasks') }}">Completed</a>
                     </li>
                     <li id="Add_Tasks" class="current">
-                        <a href="{{ url_for('task') }}">Add Tasks</a>
+                        <a href="{{ url_for('activePages.task') }}">Add Tasks</a>
                     </li>
                     <li id="Logout">
                         <a href="{{ url_for('logout') }}">Logout</a>

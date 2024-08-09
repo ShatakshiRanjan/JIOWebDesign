@@ -18,13 +18,13 @@
             <nav>
                 <ul>
                     <li id="Dashboard">
-                        <a href="{{ url_for('nextpage') }}">My Tasks</a>
+                        <a href="{{ url_for('activePages.nextpage') }}">My Tasks</a>
                     </li>
                     <li id="Completed_Tasks">
-                        <a href="{{ url_for('completed_tasks') }}">Completed</a>
+                        <a href="{{ url_for('activePages.completed_tasks') }}">Completed</a>
                     </li>
-                    <li id="Add_Tasks" class="current">
-                        <a href="{{ url_for('task') }}">Add Tasks</a>
+                    <li id="Add_Tasks">
+                        <a href="{{ url_for('activePages.task') }}">Add Tasks</a>
                     </li>
                     <li id="Logout">
                         <a href="{{ url_for('logout') }}">Logout</a>
@@ -35,36 +35,43 @@
     </header>
     <main>
         <h1>Discussion Board</h1>
-        <button  class="new-button" onclick="document.getElementById('new_post_modal').style.display='block'"><span>Create New Post</span></button>
-        <div id="new_post_modal" style="display: none" class="w3-modal">
-            <div class="w3-modal-content w3-animate-top w3-card-4">
-                <h1 style="margin-top: 2%">Create New Post</h1>
-                <form method="POST">
-                    <input type="text" name="title" placeholder="Title" required><br>
-                    <textarea name="body" placeholder="Write your post here..." required></textarea><br>
-                    <button class=sub-button type="submit">Submit</button>
-                </form>
-                <div style="text-align: center;">
-                    <button class="new-button" onclick="document.getElementById('new_post_modal').style.display='none'" style="width:50%; margin-bottom: 2%;"><span>Back to Discussion Board</span></button>
+        <div>
+
+            <button  class="new-button" onclick="document.getElementById('new_post_modal').style.display='block'" style="margin-left:10%"><span>Create New Post</span></button>
+            <button  class="new-button" onclick="window.location.href='{{ url_for('activePages.archieved_posts') }}';" style="float:right; margin-right:10%"><span>Archieved Posts</span></button>
+
+            <div id="new_post_modal" style="display: none" class="w3-modal">
+                <div class="w3-modal-content w3-animate-top w3-card-4">
+                    <h1 style="margin-top: 2%">Create New Post</h1>
+                    <form method="POST">
+                        <input type="text" name="title" placeholder="Title" required><br>
+                        <textarea name="body" placeholder="Write your post here..." required></textarea><br>
+                        <button class=sub-button type="submit">Submit</button>
+                    </form>
+                    <div style="text-align: center;">
+                        <button class="new-button" onclick="document.getElementById('new_post_modal').style.display='none'" style="width:50%; margin-bottom: 2%;"><span>Back to Discussion Board</span></button>
+                    </div>
+                    <a href="{{ url_for('activePages.nextpage') }}" id="fixed-round-button">
+                        <img src="{{ url_for('static', filename='images/to-do.png') }}" alt="Button Image">
+                    </a>
                 </div>
-                <a href="{{ url_for('nextpage') }}" id="fixed-round-button">
+            </div>
+            <div>
+                <div id="posts">
+                    {% for post in posts %}
+                    <div class="post">
+                        <h2><a style="text-decoration: none; color: black" href="{{ url_for('activePages.post', post_id=post.id) }}">{{ post.title }}</a></h2>
+                        <p>{{ post.body }}</p>
+                        <small>By {{ post.first_name }} {{ post.last_name }} on {{ post.created_at }}</small>
+                        <button class="delete-button" onclick="confirmDelete({{ post.id }})">✖</button>
+                    </div>
+                    {% endfor %}
+                </div>
+                <a href="{{ url_for('activePages.nextpage') }}" id="fixed-round-button">
                     <img src="{{ url_for('static', filename='images/to-do.png') }}" alt="Button Image">
                 </a>
             </div>
         </div>
-        <div id="posts">
-            {% for post in posts %}
-            <div class="post">
-                <h2><a style="text-decoration: none; color: black" href="{{ url_for('post', post_id=post.id) }}">{{ post.title }}</a></h2>
-                <p>{{ post.body }}</p>
-                <small>By {{ post.first_name }} {{ post.last_name }} on {{ post.created_at }}</small>
-                <button class="delete-button" onclick="confirmDelete({{ post.id }})">✖</button>
-            </div>
-            {% endfor %}
-        </div>
-        <a href="{{ url_for('nextpage') }}" id="fixed-round-button">
-            <img src="{{ url_for('static', filename='images/to-do.png') }}" alt="Button Image">
-        </a>
     </main>
 </body>
 </html>

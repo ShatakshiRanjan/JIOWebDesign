@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify, send_from_directory
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify, send_from_directory, Blueprint
+from flask import current_app as app
 from flask_mysqldb import MySQL
 import MySQLdb.cursors
 import hashlib
@@ -6,6 +7,8 @@ import os
 from datetime import timedelta
 from apscheduler.schedulers.background import BackgroundScheduler
 import config
+
+activePages = Blueprint('activePages', __name__)
 
 app = Flask(__name__)
 
@@ -17,22 +20,16 @@ app.config['MYSQL_DB'] = config.MYSQL_DB
 
 mysql = MySQL(app)
 
-def favicon():
-    return send_from_directory(os.path.join(app.root_path, 'static', 'Images'), 'favicon.ico')
+frontPages = Blueprint('frontPages', __name__)
 
-scheduler = BackgroundScheduler()
+@app.before_first_request
+def logout():
+    session.clear()
 
-def remove_old_completed_tasks():
-    cursor = mysql.connection.cursor()
-    cursor.execute("DELETE FROM tasks WHERE completed = TRUE AND completion_date < NOW() - INTERVAL 1 DAY")
-    mysql.connection.commit()
-    cursor.close()
-
-scheduler.add_job(func=remove_old_completed_tasks, trigger="interval", days=1)
-scheduler.start()
-
-@app.route("/register", methods=["GET", "POST"])
+@frontPages.route("/register", methods=["GET", "POST"])
 def register():
+    if 'user_id' in session:
+        session.clear()
     if request.method == "POST":
         email = request.form.get("email")
         first_name = request.form.get("first_name")
@@ -51,11 +48,13 @@ def register():
         mysql.connection.commit()
         cursor.close()
 
-        return redirect(url_for("login"))
+        return redirect(url_for("frontPages.login"))
     return render_template("register.html")
 
-@app.route("/login", methods=["GET", "POST"])
+@frontPages.route("/login", methods=["GET", "POST"])
 def login():
+    if 'user_id' in session:
+        session.clear()
     if request.method == "POST":
         email = request.form.get("email")
         password = request.form.get("password")
@@ -73,23 +72,69 @@ def login():
         if user['passw'] == hashed_password:
             session["user_id"] = user['id']
             session.permanent = True
-            return redirect(url_for("nextpage"))
+            app.permanent_session_lifetime = timedelta(minutes=20)
+            scheduler.add_job(archieve_posts, trigger="interval", hours=1)
+            return redirect(url_for("activePages.nextpage"))
         else:
             return render_template("login.html", error="Incorrect username or password")
 
     return render_template("login.html")
 
 
-@app.route('/')
+@frontPages.route('/')
 def home():
+    if 'user_id' in session:
+        session.clear()
     Background = os.path.join(os.path.join("static", "Images"), "background_1.jpg")
     return render_template('index.html', user_image=Background)
 
-@app.route('/dashboard')
+app.register_blueprint(frontPages)
+
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static', 'Images'), 'favicon.ico')
+
+scheduler = BackgroundScheduler()
+
+def remove_old_completed_tasks():
+    cursor = mysql.connection.cursor()
+    cursor.execute("DELETE FROM tasks WHERE completed = TRUE AND completion_date < NOW() - INTERVAL 1 DAY")
+    mysql.connection.commit()
+    cursor.close()
+
+scheduler.add_job(func=remove_old_completed_tasks, trigger="interval", days=1)
+scheduler.start()
+
+
+def archieve_posts():
+    with app.app_context():
+        cursor = mysql.connection.cursor()
+        cursor.execute("""INSERT INTO archieved_posts (post_id, user_id, title, body, created_at)
+                          SELECT id, user_id, title, body, created_at FROM posts
+                          WHERE TIMESTAMPDIFF(HOUR, created_at, NOW()) > 1;""")
+        cursor.execute("""UPDATE comments, archieved_posts, posts
+                            SET comments.post_id = NULL, comments.archieved = 1, comments.archieved_id = archieved_posts.id 
+                            WHERE posts.id = archieved_posts.post_id;""")
+        cursor.execute("""DELETE FROM posts
+                          WHERE TIMESTAMPDIFF(HOUR, created_at, NOW()) > 1;""")
+        mysql.connection.commit()
+        cursor.close()
+        print("Posts archived")
+
+
+
+
+@activePages.before_request
+def update_session():
+    if not session.get('user_id'):
+        return redirect(url_for('logout'))
+    else:
+        session.modified = True
+
+@activePages.route('/dashboard')
 def nextpage():
     user_id = session.get("user_id")
     if not user_id:
-        return redirect(url_for('login'))
+        return redirect(url_for('logout'))
 
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
 
@@ -147,8 +192,13 @@ def nextpage():
 
 
 
-@app.route('/task')
+@activePages.route('/task')
 def task():
+    user_id = session.get("user_id")
+    if not user_id:
+        return redirect(url_for('logout'))
+        return jsonify(success=False, message="User not logged in"), 401
+
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute("SELECT id, first_name, last_name FROM users")
     users = cursor.fetchall()
@@ -159,10 +209,12 @@ def task():
     cursor.close()
     return render_template('htmltask.html', users=users, projects=projects)
 
-@app.route('/submit_task', methods=['POST'])
+@activePages.route('/submit_task', methods=['POST'])
 def submit_task():
     task_type = request.form['type']
     user_id = session.get("user_id")
+    if not user_id:
+        return jsonify(success=False, message="User not logged in"), 401
 
     if task_type == 'project':
         project_name = request.form['name']
@@ -177,7 +229,7 @@ def submit_task():
         mysql.connection.commit()
         cursor.close()
         
-        return redirect(url_for('task'))
+        return redirect(url_for('activePages.task'))
 
     # Handle task or event creation
     task_name = request.form['name']
@@ -220,7 +272,7 @@ def submit_task():
 
     return redirect(url_for('task'))
 
-@app.route('/delete_task', methods=['POST'])
+@activePages.route('/delete_task', methods=['POST'])
 def delete_task():
     user_id = session.get("user_id")
     if not user_id:
@@ -243,7 +295,7 @@ def delete_task():
         print(f"Error deleting task: {e}")
         return jsonify(success=False, message="Database error"), 500
 
-@app.route('/complete_task', methods=['POST'])
+@activePages.route('/complete_task', methods=['POST'])
 def complete_task():
     user_id = session.get("user_id")
     if not user_id:
@@ -257,7 +309,7 @@ def complete_task():
     
     return jsonify(success=True)
 
-@app.route('/completed_tasks')
+@activePages.route('/completed_tasks')
 def completed_tasks():
     user_id = session.get("user_id")
     if not user_id:
@@ -282,7 +334,7 @@ def completed_tasks():
     
     return render_template('completed_tasks.html', tasks=tasks)
 
-@app.route('/mark_incomplete', methods=['POST'])
+@activePages.route('/mark_incomplete', methods=['POST'])
 def mark_incomplete():
     user_id = session.get("user_id")
     if not user_id:
@@ -296,7 +348,7 @@ def mark_incomplete():
 
     return jsonify({'success': True}), 200
 
-@app.route('/delete_post', methods=['POST'])
+@activePages.route('/delete_post', methods=['POST'])
 def delete_post():
     user_id = session.get("user_id")
     if not user_id:
@@ -319,7 +371,7 @@ def delete_post():
         print(f"Error deleting post: {e}")
         return jsonify(success=False, message="Database error"), 500
 
-@app.route('/discussion_board', methods=['GET', 'POST'])
+@activePages.route('/discussion_board', methods=['GET', 'POST'])
 def discussion_board():
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute("""
@@ -339,10 +391,10 @@ def discussion_board():
         cursor.execute("INSERT INTO posts (user_id, title, body) VALUES (%s, %s, %s)", (user_id, title, body))
         mysql.connection.commit()
         cursor.close()
-        return redirect(url_for('discussion_board'))
+        return redirect(url_for('activePages.discussion_board'))
     return render_template('CommunityChat.html', posts=posts)
 
-@app.route('/archieved_posts', methods=['GET', 'POST'])
+@activePages.route('/archieved_posts', methods=['GET', 'POST'])
 def archieved_posts():
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute("""
@@ -355,7 +407,7 @@ def archieved_posts():
     cursor.close()
     return render_template('ArchievedChat.html', archieved_post=archieved_posts)
 
-@app.route('/archieved_post/<int:archieved_id>', methods=['GET', 'POST'])
+@activePages.route('/archieved_post/<int:archieved_id>', methods=['GET', 'POST'])
 def archieved_post(archieved_id):
 
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -393,7 +445,7 @@ def archieved_post(archieved_id):
 #         return redirect(url_for('discussion_board'))
 #     return render_template('newPost.html')
 
-@app.route('/post/<int:post_id>', methods=['GET', 'POST'])
+@activePages.route('/post/<int:post_id>', methods=['GET', 'POST'])
 def post(post_id):
     if request.method == 'POST':
         body = request.form.get('body')
@@ -425,14 +477,16 @@ def post(post_id):
     
     return render_template('Post.html', post=post, comments=comments, archieved_check=False)
 
-@app.route('/calendar')
+@activePages.route('/calendar')
 def calendar():
     return render_template('calendar.html')
 
 @app.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for('home'))
+    return redirect(url_for('frontPages.home'))
+
+app.register_blueprint(activePages)
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8000, debug=True)

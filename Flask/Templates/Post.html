@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='idex.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='Images/favicon.ico') }}">
+    <script src="{{ url_for('static', filename='idex.js') }}" defer></script>
     <style>
         h2 {
             text-align: left;
@@ -17,11 +18,23 @@
 <body>
     <div id="posts">
         <h1>{{ post.title }}</h1>
+        <div>
+            {% if archieved_check == 0 %}
+            <div style="text-align: right;">
+                <button class="new-button" onclick="window.location.href='{{ url_for('activePages.discussion_board') }}';" id="back-button" style="margin:0; padding:0; scale:1.7; width:auto; height: 20px; background-color: rgb(2, 57, 123);" title="Back to Discussion Board">⬅️</button>
+                <!-- <input type="image" href={{ url_for('static', filename='Images/icon-back-0.jpg') }} style="margin: 0; padding:0;" /> -->
+            </div>
+            {% else %}
+            <div style="text-align: center;">
+                <class="new-button" onclick="window.location.href='{{ url_for('activePages.archieved_posts') }}';" id="back-button" style="margin:0; padding:0; scale:1.7; width:auto; height: 20px; background-color: rgb(2, 57, 123);" title="Back to Archieved Posts"><span></span></button>
+            </div>
+            {% endif %}
+        </div>
         <p>{{ post.body }}</p>
         <small>By {{ post.first_name }} {{ post.last_name }} on {{ post.created_at }}</small>
     </div>
     <h2>Comments</h2>
-    {% if archeived_check == 0 %}
+    {% if archieved_check == 0 %}
     <form method="POST">
         <textarea name="body" placeholder="Write your comment here..." required></textarea><br>
         <button class="sub-button" type="submit">Submit</button>
@@ -44,16 +57,7 @@
             {% endfor %}
         {% endif %}
     </div>
-    {% if comments.archieved == 0 %}
-    <div style="text-align: center;">
-        <button class="new-button" onclick="window.location.href='{{ url_for('discussion_board') }}';" id="back-button" style="width: 90%">Back to Discussion Board</button>
-    </div>
-    {% else %}
-    <div style="text-align: center;">
-        <button class="new-button" onclick="window.location.href='{{ url_for('archieved_posts') }}';" id="back-button" style="width: 90%">Back to Archieved Posts</button>
-    </div>
-    {% endif %}
-    <a href="{{ url_for('nextpage') }}" id="fixed-round-button">
+    <a href="{{ url_for('activePages.nextpage') }}" id="fixed-round-button">
         <img src="{{ url_for('static', filename='images/to-do.png') }}" alt="Button Image">
     </a>
 </body>
