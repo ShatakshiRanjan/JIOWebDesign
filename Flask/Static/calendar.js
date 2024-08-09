@@ -214,18 +214,18 @@
 
     Calendar.prototype.drawLegend = function() {
         var legend = createElement('div', 'legend');
-        var calendars = this.events.map(function(e) {
-            return e.calendar + '|' + e.color;
-        }).reduce(function(memo, e) {
-            if (memo.indexOf(e) === -1) {
-                memo.push(e);
+        var calendars = this.events.reduce(function(memo, e) {
+            if (!memo[e.calendar]) {
+                memo[e.calendar] = e.color;
             }
             return memo;
-        }, []).forEach(function(e) {
-            var parts = e.split('|');
-            var entry = createElement('span', 'entry ' + parts[1], parts[0]);
+        }, {});
+
+        for (var key in calendars) {
+            var entry = createElement('span', 'entry ' + calendars[key], key);
             legend.appendChild(entry);
-        });
+        }
+
         this.el.appendChild(legend);
     }
 

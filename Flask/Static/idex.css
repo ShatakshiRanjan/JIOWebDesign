@@ -1,27 +1,32 @@
-body{
+body {
     font: 15px/1.5 Arial, Helvetica, sans-serif;
-    padding:0;
-    margin:0 0 0 0;
-    height:100%;
-    margin: 3%;
-    overflow: hidden;
+    padding: 0;
+    margin: 0;
+    height: 100%;
 }
+
 #main-container {
     display: flex;
     justify-content: space-between;
     padding: 2%;
+    height: calc(100vh - 200px); /* Adjust height to fit the screen */
+}
+
+#calendar_sec {
+    width: 45%;
+    margin-right: 20px;
 }
 
 #tasks-container {
-    width: 50%;
+    width: 45%;
     height: 600px;
-    overflow-y: auto; 
-    padding-left: 20px; 
+    overflow-y: auto;
+    padding-left: 20px;
 }
 
 /* Task Details Modal */
 #task-details-modal {
-    display: none; 
+    display: none;
     position: fixed;
     top: 50%;
     left: 50%;
@@ -49,34 +54,40 @@ body{
     background: rgba(0, 0, 0, 0.5);
     z-index: 999;
 }
+
 .section {
     margin-bottom: 20px;
 }
+
 .section h3 {
     margin-bottom: 10px;
 }
+
 .section ul {
     list-style-type: none;
     padding: 0;
 }
+
 .section ul li {
-    background-color: #f9f9f9;
+    background-color: #f0f0f0;
     margin-bottom: 10px;
     padding: 10px;
     border-radius: 5px;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
     cursor: pointer;
-    justify-content: space-between;
     display: flex;
+    justify-content: space-between;
 }
+
 .section ul li:hover {
-    background-color: #f0f0f0;
+    background-color: #f0f0f0ea;
 }
 
 /* Task List */
 .task-button:active {
     transform: scale(0.98);
 }
+
 .task-details {
     margin-top: 20px;
     padding: 10px;
@@ -84,24 +95,18 @@ body{
     border-radius: 5px;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
 }
+
 .task-item label {
     flex-grow: 1;
     margin-left: 10px;
 }
+
 .task-item input[type="checkbox"] {
     margin-left: 10px;
 }
 
-.task-item-c label {
-    flex-grow: 1;
-    margin-left: 10px;
-}
-.task-item-c input[type="checkbox"] {
-    margin-left: 10px;
-}
-
 /* Delete buttons */
-.delete-button {
+.delete-button, .delete-button1 {
     background: none;
     border: none;
     color: red;
@@ -109,19 +114,7 @@ body{
     cursor: pointer;
 }
 
-.delete-button:hover {
-    color: darkred;
-}
-
-.delete-button1 {
-    background: none;
-    border: none;
-    color: red;
-    font-size: 1.2em;
-    cursor: pointer;
-}
-
-.delete-button1:hover {
+.delete-button:hover, .delete-button1:hover {
     color: darkred;
 }
 
@@ -153,3 +146,78 @@ body{
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
 }
 
+#project-button {
+    margin-bottom: 20px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#project-button:hover {
+    background-color: #0056b3;
+}
+
+#project-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50%;
+    padding: 20px;
+    background-color: white;
+    border-radius: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+#project-modal h2 {
+    text-align: center;
+}
+
+#project-modal ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+#project-modal ul li {
+    background-color: #f9f9f9;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+#project-modal ul li:hover {
+    background-color: #f0f0f0;
+}
+
+#project-modal button {
+    display: block;
+    margin: 20px auto 0;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#project-modal button:hover {
+    background-color: #0056b3;
+}
+
+#project-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
