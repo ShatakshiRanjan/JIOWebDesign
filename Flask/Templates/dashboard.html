@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='idex.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='button.css') }}">
     <script src="{{ url_for('static', filename='moment.min.js') }}" defer></script>
     <script src="{{ url_for('static', filename='idex.js') }}" defer></script>
     <script src="{{ url_for('static', filename='calendar.js') }}" defer></script>
@@ -37,33 +38,67 @@
     </header>
     <main>
         <div class="task-container">
-            <h1>Hello, {{ first_name }}</h1>
-            <button id="project-button">Projects</button>
+            <h1>Hello {{ first_name }}!</h1>
+            <h2>Here is your Dashboard!</h2>
+            <div style="display: flex; margin-left: 10%; width: 100%">
+                <div style="display:inline-block; width:20%; flex-grow:0.05; text-align: left;">
+                    <button class="new-button" id="ListViewToggle-button" data-value="0" style="width:100%; padding: 18px;"><span><div id="ListViewToggle">Change to List View</div></span></button> 
+                </div>
+                <div style="display:inline-block; flex-grow:0.7; text-align: right; width:20%">
+                    <button class="new-button" id="project-button" style=" width: 50%; padding: 18px;"><span>Ongoing Projects</span></button>
+                </div>
+            </div>
             <div id="main-container">
                 <div id="calendar_sec">
-                    <div id="calendar"></div>
+                    <div style="display:inline-block; width:70%;">
+                        <div id="calendar"></div>
+                    </div>
+                    <div id="todays-event-details" style="float:right; width:25%; margin-top:10%; padding-top:1%; margin-left: 20px; height:400px; background-color: rgb(23, 41, 103); border-radius: 2%;">
+                        <h3 style="text-align: center; color: white;">Work List</h3>
+                    </div>
                 </div>
-                <div id="tasks-container">
+                <div id="tasks-container" style="display: none;">
                     <div class="section">
                         <h3>Tasks</h3>
                         <ul id="tasks-list">
                             {% for task in tasks %}
-                                <li class="task-item"
-                                    data-type="{{ task['type'] }}"
-                                    data-task="{{ task['task'] }}"
-                                    data-start-date="{{ task['dateOfTaskStart'] }}"
-                                    data-start-time="{{ task['timeOfTaskStart'] }}"
-                                    data-end-date="{{ task['dateOfTaskEnd'] }}"
-                                    data-end-time="{{ task['timeOfTaskEnd'] }}"
-                                    data-due-date="{{ task['dueDate'] }}"
-                                    data-due-time="{{ task['dueTime'] }}"
-                                    data-dedicated-to="{{ task['assigned_users'] }}"
-                                    data-description="{{ task['descript'] }}"
-                                    data-completion-date="{{ task['completion_date'] }}">
-                                    <input type="checkbox" id="task{{ task['TID'] }}" name="task{{ task['TID'] }}" value="{{ task['TID'] }}" {% if task['completed'] %} checked {% endif %} onclick="completeTask({{ task['TID'] }})">
-                                    <label>{{ task['task'] }}</label>
-                                    <button class="delete-button1" onclick="deleteTask({{ task['TID'] }})">✖</button>
-                                </li>
+                                {% if task['type'] == 'task' %}
+                                    <li class="task-item"
+                                        data-type="{{ task['type'] }}"
+                                        data-task="{{ task['task'] }}"
+                                        data-start-date="{{ task['dateOfTaskStart'] }}"
+                                        data-start-time="{{ task['timeOfTaskStart'] }}"
+                                        data-end-date="{{ task['dateOfTaskEnd'] }}"
+                                        data-end-time="{{ task['timeOfTaskEnd'] }}"
+                                        data-due-date="{{ task['dueDate'] }}"
+                                        data-due-time="{{ task['dueTime'] }}"
+                                        data-dedicated-to="{{ task['assigned_users'] }}"
+                                        data-description="{{ task['descript'] }}"
+                                        data-completion-date="{{ task['completion_date'] }}">
+                                        <input type="checkbox" id="task{{ task['TID'] }}" name="task{{ task['TID'] }}" value="{{ task['TID'] }}" {% if task['completed'] %} checked {% endif %} onclick="completeTask({{ task['TID'] }})">
+                                        <label>{{ task['task'] }}</label>
+                                        <button class="delete-button1" onclick="deleteTask({{ task['TID'] }})">✖</button>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                        <h3>Events</h3>
+                        <ul id="tasks-list">
+                            {% for task in tasks %}
+                                {% if task['type'] == 'event' %}
+                                    <li class="task-item"
+                                        data-type="{{ task['type'] }}"
+                                        data-task="{{ task['task'] }}"
+                                        data-due-date="{{ task['dueDate'] }}"
+                                        data-due-time="{{ task['dueTime'] }}"
+                                        data-dedicated-to="{{ task['assigned_users'] }}"
+                                        data-description="{{ task['descript'] }}"
+                                        data-completion-date="{{ task['completion_date'] }}">
+                                        <input type="checkbox" id="task{{ task['TID'] }}" name="task{{ task['TID'] }}" value="{{ task['TID'] }}" {% if task['completed'] %} checked {% endif %} onclick="completeTask({{ task['TID'] }})">
+                                        <label>{{ task['task'] }}</label>
+                                        <button class="delete-button1" onclick="deleteTask({{ task['TID'] }})">✖</button>
+                                    </li>
+                                {% endif %}
                             {% endfor %}
                         </ul>
                     </div>
@@ -71,7 +106,7 @@
             </div>
     
             <!-- Task Details Modal -->
-            <div id="modal-overlay"></div>
+            <div id="modal-overlay" onclick="closeModal()"></div>
             <div id="task-details-modal">
                 <h2>Task Details</h2>
                 <p><strong>Task:</strong> <span id="details-task"></span></p>
@@ -80,25 +115,31 @@
                 <p id="details-end-date-time" style="display: none;"><strong>Ends:</strong> <span id="details-end-date"></span> at <span id="details-end-time"></span></p>
                 <p><strong>Assigned To:</strong> <span id="details-dedicated-to"></span></p>
                 <p><strong>Description:</strong> <span id="details-description"></span></p>
-                <button onclick="closeModal()">Close</button>
+                <div style="text-align: center;">
+                    <button class="new-button" onclick="closeModal()" style="padding: 15px;"><span>Close</span></button>
+                </div>
             </div>
         </div>
     </main>
     
-    <div id="project-modal-overlay"></div>
+    <div id="project-modal-overlay" onclick="closeProjectModal()"></div>
     <div id="project-modal">
-        <h2>Projects</h2>
-        <ul>
-            {% for project in projects %}
-                <li>
-                    {{ project.name }}
-                    {% if project.name != "General" %}
-                        <button class="delete-project-button" data-project-id="{{ project.id }}">✖</button>
-                    {% endif %}
-                </li>
-            {% endfor %}
-        </ul>
-        <button onclick="closeProjectModal()">Close</button>
+        <div class="project-section">
+            <h2>Projects</h2>
+            <ul id="projects-list">
+                {% for project in projects %}
+                    <li class="project-item">
+                        <label>{{ project.name }}</label>
+                        {% if project.name != "General" %}
+                            <button class="delete-project-button" data-project-id="{{ project.id }}" >✖</button>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+            <div style="text-align: center;">
+                <button class="new-button" onclick="closeProjectModal()" style="padding: 15px;"><span>Close</span></button>
+            </div>
+        </div>
     </div>
     
     
@@ -120,6 +161,24 @@
             document.getElementById('project-modal').style.display = 'none';
             document.getElementById('project-modal-overlay').style.display = 'none';
         }
+
+        document.getElementById('ListViewToggle-button').addEventListener('click', function() {
+            var ListViewToggle_button = document.getElementById('ListViewToggle-button');
+            var ListViewToggle = document.getElementById('ListViewToggle');
+            var value = ListViewToggle_button.getAttribute('data-value');
+            if(value==0){
+                document.getElementById('calendar_sec').style.display = 'none';
+                document.getElementById('tasks-container').style.display = 'block';
+                ListViewToggle.textContent = 'Change to Calendar View';
+                ListViewToggle_button.setAttribute('data-value', 1);
+            }
+            else{
+                document.getElementById('tasks-container').style.display = 'none';
+                document.getElementById('calendar_sec').style.display = 'block';
+                document.getElementById('ListViewToggle').textContent = 'Change to List View';
+                ListViewToggle_button.setAttribute('data-value', 0);
+            }
+        });
     </script>
 </body>    
 </html>

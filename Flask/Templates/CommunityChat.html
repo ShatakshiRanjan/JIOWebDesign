@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='Chat.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='idex.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='button.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='Images/favicon.ico') }}">
     <script src="{{ url_for('static', filename='idex.js') }}" defer></script>
 </head>
@@ -41,6 +42,7 @@
             <button  class="new-button" onclick="window.location.href='{{ url_for('activePages.archieved_posts') }}';" style="float:right; margin-right:10%"><span>Archieved Posts</span></button>
 
             <div id="new_post_modal" style="display: none" class="w3-modal">
+                <div id="project-modal-overlay" onclick="document.getElementById('new_post_modal').style.display='none'"></div>
                 <div class="w3-modal-content w3-animate-top w3-card-4">
                     <h1 style="margin-top: 2%">Create New Post</h1>
                     <form method="POST">
@@ -63,7 +65,7 @@
                         <h2><a style="text-decoration: none; color: black" href="{{ url_for('activePages.post', post_id=post.id) }}">{{ post.title }}</a></h2>
                         <p>{{ post.body }}</p>
                         <small>By {{ post.first_name }} {{ post.last_name }} on {{ post.created_at }}</small>
-                        <button class="delete-button" onclick="confirmDelete({{ post.id }})">✖</button>
+                        <button class="delete-button-chat" onclick="confirmDelete({{ post.id }})">✖</button>
                     </div>
                     {% endfor %}
                 </div>
@@ -73,5 +75,13 @@
             </div>
         </div>
     </main>
+    <script>
+        function confirmDelete(post_id) {
+            if (confirm("Are you sure you want to delete this post?")) {
+                window.location.href = "/delete_post/" + post_id;
+            }
+        }
+
+    </script>
 </body>
 </html>

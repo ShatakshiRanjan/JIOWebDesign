@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify, send_from_directory, Blueprint
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify, send_from_directory, Blueprint, flash
 from flask import current_app as app
 from flask_mysqldb import MySQL
 import MySQLdb.cursors
@@ -25,6 +25,8 @@ frontPages = Blueprint('frontPages', __name__)
 @app.before_first_request
 def logout():
     session.clear()
+    archieve_posts()
+    scheduler.add_job(archieve_posts, trigger="interval", hours=1)
 
 @frontPages.route("/register", methods=["GET", "POST"])
 def register():
@@ -73,7 +75,6 @@ def login():
             session["user_id"] = user['id']
             session.permanent = True
             app.permanent_session_lifetime = timedelta(minutes=20)
-            scheduler.add_job(archieve_posts, trigger="interval", hours=1)
             return redirect(url_for("activePages.nextpage"))
         else:
             return render_template("login.html", error="Incorrect username or password")
@@ -126,7 +127,9 @@ def archieve_posts():
 @activePages.before_request
 def update_session():
     if not session.get('user_id'):
-        return redirect(url_for('logout'))
+        flash("Session expired. Please login again.")
+        session.clear()
+        return redirect(url_for('frontPages.login'))
     else:
         session.modified = True
 
@@ -246,13 +249,34 @@ def submit_task():
     if task_type == 'project':
         project_name = request.form['name']
         project_description = request.form['description']
+        project_start_date = request.form.get('startDate') or None
+        project_end_date = request.form.get('endDate') or None
         
-        sql_project = """
-            INSERT INTO projects (name, description, user_id)
-            VALUES (%s, %s, %s)
-        """
         cursor = mysql.connection.cursor()
-        cursor.execute(sql_project, (project_name, project_description, user_id))
+        if(project_start_date == None and project_end_date == None):
+            sql_project = """
+                INSERT INTO projects (name, description, user_id)
+                VALUES (%s, %s, %s)
+            """
+            cursor.execute(sql_project, (project_name, project_description, user_id))
+        elif project_start_date == None:
+            sql_project = """
+                INSERT INTO projects (name, description, user_id, dateofTaskEnd)
+                VALUES (%s, %s, %s, %s)
+            """
+            cursor.execute(sql_project, (project_name, project_description, user_id, project_end_date))
+        elif(project_end_date == None):
+            sql_project = """
+                INSERT INTO projects (name, description, user_id, dateOfTaskStart)
+                VALUES (%s, %s, %s, %s)
+            """
+            cursor.execute(sql_project, (project_name, project_description, user_id, project_start_date))
+        else:
+            sql_project = """
+                INSERT INTO projects (name, description, user_id, dateOfTaskStart, dateofTaskEnd)
+                VALUES (%s, %s, %s,%s, %s)
+            """
+            cursor.execute(sql_project, (project_name, project_description, user_id, project_start_date, project_end_date))
         mysql.connection.commit()
         cursor.close()
         
@@ -297,7 +321,7 @@ def submit_task():
     mysql.connection.commit()
     cursor.close()
 
-    return redirect(url_for('task'))
+    return redirect(url_for('activePages.task'))
 
 @activePages.route('/delete_task', methods=['POST'])
 def delete_task():

@@ -588,7 +588,7 @@ main{
 /* Calendar */
 #calendar_sec{
     float:left;
-    width: 50%;
+    width: 100%;
 }
 #calendar {
     font-family: 'HelveticaNeue-UltraLight', 'Helvetica Neue UltraLight', 'Helvetica Neue', Arial, Helvetica, sans-serif;
@@ -608,6 +608,7 @@ main{
     transform: translate3d(0, 0, 0);
     margin: 0 auto;
     height: 600px;
+    width: 100%;
     overflow: hidden;
     display:block;
     text-align: center;
@@ -664,6 +665,8 @@ main{
 
 .month.new {
     -webkit-animation: fadeIn 1s ease-out;
+    -moz-animation: fadeIn 1s ease-out;
+    animation: fadeIn 1s ease-out;
     opacity: 1;
     margin-top: 20px;
 }
@@ -759,10 +762,36 @@ main{
 .green { background: rgba(153, 198, 109, 1); }
 .yellow { background: rgba(249, 233, 0, 1); }
 
+#details-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+#details-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50%;
+    padding: 20px;
+    background-color: white;
+    border-radius: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
 .details {
     position: relative;
-    width: 100%;
-    height: 75px;
+    width: 80%;
+    margin-left: 10%;
+    height: 320px;
     background: rgba(164, 164, 164, 1);
     margin-top: 5px;
     border-radius: 4px;
@@ -794,16 +823,15 @@ main{
 }
 
 .events {
-    height: 75px;
     padding: 7px 0;
     overflow-y: auto;
     overflow-x: hidden;
 }
 
 .events.in {
-    -webkit-animation: fadeIn .3s ease both;
-    -moz-animation: fadeIn .3s ease both;
-    animation: fadeIn .3s ease both;
+    -webkit-animation: fadeIn .5s ease both;
+    -moz-animation: fadeIn .5s ease both;
+    animation: fadeIn .5s ease both;
 }
 
 .events.in {
@@ -813,6 +841,9 @@ main{
 }
 
 .details.out .events {
+    -webkit-animation-delay: .3s;
+    -moz-animation-delay: .3s;
+    animation-delay: .3s;
     -webkit-animation: fadeOutShrink .4s ease both;
     -moz-animation: fadeOutShink .4s ease both;
     animation: fadeOutShink .4s ease both;
@@ -907,20 +938,20 @@ main{
     to { opacity: 0; -webkit-transform: translateY(-30%) scale(.95); }
 }
 @-moz-keyframes moveToTopFadeMonth {
-    to { opacity: 0; -moz-transform: translateY(-30%); }
+    to { opacity: 0; -webkit-transform: translateY(-30%); }
 }
 @keyframes moveToTopFadeMonth {
-    to { opacity: 0; -moz-transform: translateY(-30%); }
+    to { opacity: 0; -webkit-transform: translateY(-30%); }
 }
 
 @-webkit-keyframes moveFromTopFadeMonth {
     from { opacity: 0; -webkit-transform: translateY(30%) scale(.95); }
 }
 @-moz-keyframes moveFromTopFadeMonth {
-    from { opacity: 0; -moz-transform: translateY(30%); }
+    from { opacity: 0; -webkit-transform: translateY(30%); }
 }
 @keyframes moveFromTopFadeMonth {
-    from { opacity: 0; -moz-transform: translateY(30%); }
+    from { opacity: 0; -webkit-transform: translateY(30%); }
 }
 
 @-webkit-keyframes moveToBottomFadeMonth {

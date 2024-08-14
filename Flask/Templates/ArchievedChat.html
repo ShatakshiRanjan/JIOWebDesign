@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='Chat.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='idex.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='button.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='Images/favicon.ico') }}">
     <script src="{{ url_for('static', filename='idex.js') }}" defer></script>
 </head>
@@ -36,6 +37,9 @@
     </header>
     <main>
         <h1>Archieved Chats</h1>
+        <div style="text-align:center;">
+            <button  class="new-button" onclick="window.location.href='{{ url_for('activePages.discussion_board') }}';" style="width:20%"><span>Back to Discussion Board</span></button>
+        </div>
 
         <div id="posts">
             {% for x in archieved_post %}

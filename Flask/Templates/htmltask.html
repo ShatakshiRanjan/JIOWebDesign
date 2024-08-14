@@ -37,6 +37,16 @@
             border-radius: 4px;
             box-sizing: border-box;
         }
+
+        .form-group input[type="date"]:hover, input[type="time"]:hover{
+            cursor: pointer;
+        }
+
+        .form-group input:focus, select:focus, textarea:focus{
+            outline: none;
+            border: 2px solid #3e10a2;
+        }
+
         .form-group-half {
             width: 48%;
             display: inline-block;
@@ -65,6 +75,11 @@
         input[type="submit"]:hover {
             background-color: #300983;
         }
+        input[type="submit"]:focus {    
+            outline: none;
+            background-color: #300983;
+        }
+
         .dropdown-checkbox {
             position: relative;
             display: inline-block;
@@ -125,9 +140,9 @@
         <div class="form-group form-group-full">
             <label for="type">Type:</label>
             <div class="radio-group">
-                <label><input type="radio" name="type" value="project" onclick="toggleFields()" checked> Project</label>
+                <label><input type="radio" name="type" value="project" onclick="toggleFields()" > Project</label>
+                <label><input type="radio" name="type" value="task" onclick="toggleFields()"checked> Task</label>
                 <label><input type="radio" name="type" value="event" onclick="toggleFields()"> Event</label>
-                <label><input type="radio" name="type" value="task" onclick="toggleFields()"> Task</label>
             </div>
         </div>
 
@@ -142,9 +157,10 @@
 
         <div class="form-group form-group-full" id="nameGroup">
             <label for="name">Title:</label>
-            <input type="text" id="name" name="name">
+            <input type="text" id="name" name="name" required placeholder="What is the Title?">
         </div>
 
+        <div class="error-message" id="errorMessage-2">Please assign the work to someone!</div>
         <div class="form-group form-group-full" id="assignedToGroup" style="display:none;">
             <label for="assignedTo">Assigned To:</label>
             <div class="dropdown-checkbox">
@@ -162,47 +178,63 @@
 
         <div class="form-group form-group-full" id="dateGroup" style="display:none;">
             <label for="date">Date:</label>
-            <input type="date" id="date" name="date">
+            <input type="date" id="date" name="date" onclick="this.showPicker()">
         </div>
 
         <div class="form-group form-group-full" id="timeGroup" style="display:none;">
             <label for="time">Time:</label>
-            <input type="time" id="time" name="time">
+            <input type="time" id="time" name="time" onclick="this.showPicker()">
         </div>
 
-        <div class="form-group" id="startDateGroup" style="display:none;">
-            <div class="form-group-half">
+        <div class="form-group" id="startDateGroup" style="display:none; ">
+            <div class="form-group-half" id="startDateOnly">
                 <label for="startDate">Start Date:</label>
-                <input type="date" id="startDate" name="startDate">
+                <input type="date" id="startDate" name="startDate" onclick="this.showPicker()" required>
             </div>
-            <div class="form-group-half">
+            <div class="form-group-half" id="startTimeOnly">
                 <label for="startTime">Start Time:</label>
-                <input type="time" id="startTime" name="startTime">
+                <input type="time" id="startTime" name="startTime" onclick="this.showPicker()">
             </div>
         </div>
 
         <div class="form-group" id="endDateGroup" style="display:none;">
-            <div class="form-group-half">
+            <div class="form-group-half" id="endDateOnly">
                 <label for="endDate">End Date:</label>
-                <input type="date" id="endDate" name="endDate">
+                <input type="date" id="endDate" name="endDate" onclick="this.showPicker()">
             </div>
-            <div class="form-group-half">
+            <div class="form-group-half" id="endTimeOnly">
                 <label for="endTime">End Time:</label>
-                <input type="time" id="endTime" name="endTime">
+                <input type="time" id="endTime" name="endTime" onclick="this.showPicker()">
             </div>
         </div>
 
-        <div class="error-message" id="errorMessage">End date and time must be after start date and time.</div>
+        <div class="error-message" id="errorMessage-1">End date and time must be after start date and time.</div>
 
         <div class="form-group form-group-full" id="descriptionGroup">
             <label for="description">Description:</label>
-            <textarea id="description" name="description"></textarea>
+            <textarea id="description" name="description" placeholder="Tell me more about the work..."></textarea>
         </div>
 
         <input type="submit" value="Submit">
     </form>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var startDate = document.getElementById('startDate');
+            var endDate = document.getElementById('endDate');
+            var startTime = document.getElementById('startTime');
+            var endTime = document.getElementById('endTime');
+            var dueDate = document.getElementById('date');
+            var dueTime = document.getElementById('time');
+            let ISTOffset = 5.5 * 60 * 60 * 1000;
+            startDate.value = new Date().toISOString().split('T')[0];
+            endDate.value = new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+            startTime.value = new Date(new Date().getTime()+ ISTOffset).toISOString().split('T')[1].slice(0, 5);
+            endTime.value = startTime.value;
+            dueDate.value = startDate.value;
+            dueTime.value = startTime.value;
+        });
+
         document.addEventListener('click', function(event) {
             var dropdown = document.querySelector('.dropdown-checkbox-content');
             if (event.target.matches('.dropbtn')) {
@@ -220,7 +252,11 @@
             var dateGroup = document.getElementById('dateGroup');
             var timeGroup = document.getElementById('timeGroup');
             var startDateGroup = document.getElementById('startDateGroup');
+            var startDateOnly = document.getElementById('startDateOnly');
+            var stratTimeOnly = document.getElementById('startTimeOnly');
             var endDateGroup = document.getElementById('endDateGroup');
+            var endDateOnly = document.getElementById('endDateOnly');
+            var endTimeOnly = document.getElementById('endTimeOnly');
             var assignedToGroup = document.getElementById('assignedToGroup');
 
             nameGroup.style.display = 'block';
@@ -230,9 +266,19 @@
                 projectGroup.style.display = 'none';
                 dateGroup.style.display = 'none';
                 timeGroup.style.display = 'none';
-                startDateGroup.style.display = 'none';
-                endDateGroup.style.display = 'none';
+                startDateGroup.style.display = 'block';
+                startDateOnly.style.display = 'block';
+                stratTimeOnly.style.display = 'none';
+                endDateGroup.style.display = 'block';
+                endDateOnly.style.display = 'block';
+                endTimeOnly.style.display = 'none';
                 assignedToGroup.style.display = 'none';
+                
+                startDateOnly.classList.remove('form-group-half');
+                endDateOnly.classList.remove('form-group-half');
+                startDateOnly.classList.add('form-group-full');
+                endDateOnly.classList.add('form-group-full');
+
             } else if (type === 'event') {
                 projectGroup.style.display = 'block';
                 dateGroup.style.display = 'block';
@@ -240,13 +286,26 @@
                 startDateGroup.style.display = 'none';
                 endDateGroup.style.display = 'none';
                 assignedToGroup.style.display = 'block';
+
+
             } else if (type === 'task') {
+                
+                startDateOnly.classList.remove('form-group-full');
+                endDateOnly.classList.remove('form-group-full');
+                startDateOnly.classList.add('form-group-half');
+                endDateOnly.classList.add('form-group-half');
+
                 projectGroup.style.display = 'block';
                 dateGroup.style.display = 'none';
                 timeGroup.style.display = 'none';
                 startDateGroup.style.display = 'block';
+                startDateOnly.style.display = 'inline-block';
+                stratTimeOnly.style.display = 'inline-block';
                 endDateGroup.style.display = 'block';
+                endDateOnly.style.display = 'inline-block';
+                endTimeOnly.style.display = 'inline-block';
                 assignedToGroup.style.display = 'block';
+
             }
         }
 
@@ -262,10 +321,18 @@
 
             if (type === 'task' && endDateTime <= startDateTime) {
                 event.preventDefault();
-                document.getElementById('errorMessage').style.display = 'block';
+                document.getElementById('errorMessage-1').style.display = 'block';
             } else {
-                document.getElementById('errorMessage').style.display = 'none';
+                document.getElementById('errorMessage-1').style.display = 'none';
             }
+
+            if((type === 'event' || type === 'task') && document.querySelectorAll('input[name="assignedTo[]"]:checked').length === 0) {
+                event.preventDefault();
+                document.getElementById('errorMessage-2').style.display = 'block';
+            } else {
+                document.getElementById('errorMessage-2').style.display = 'none';
+            }
+
         });
 
         toggleFields();

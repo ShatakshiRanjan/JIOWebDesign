@@ -1,3 +1,9 @@
+
+function openModal() {
+  document.getElementById('task-details-modal').style.display = 'block';
+  document.getElementById('modal-overlay').style.display = 'block';
+}
+
 !function() {
     var today = moment();
 
@@ -181,16 +187,17 @@
         var details = createElement('div', 'details in');
         details.setAttribute('data-date', day.format('YYYY-MM-DD'));
         
-        var arrow = createElement('div', 'arrow');
-        details.appendChild(arrow);
-        el.parentNode.appendChild(details);
+        // var arrow = createElement('div', 'arrow');
+        // details.appendChild(arrow);
+        var todays_event_details = document.getElementById("todays-event-details");
+        todays_event_details.appendChild(details);
 
         var todaysEvents = this.events.filter(function(ev) {
             return ev.date.isSame(day, 'day');
         });
 
         this.renderEvents(todaysEvents, details);
-        arrow.style.left = el.offsetLeft - el.parentNode.offsetLeft + 45 + 'px';
+        // arrow.style.left = el.offsetLeft - el.parentNode.offsetLeft + 45 + 'px';
     }
 
     Calendar.prototype.renderEvents = function(events, ele) {
@@ -199,8 +206,69 @@
 
         events.forEach(function(ev) {
             var div = createElement('div', 'event');
+            div.style.backgroundColor = 'white';
+            div.style.color = 'black';
+            div.style.borderRadius = '5px';
+            div.style.cursor = 'pointer';
+            div.style.margin = '5px';
+            
+            div.setAttribute('data-task', ev.task);
+            div.setAttribute('data-dedicated-to', ev.dedicatedTo);
+            div.setAttribute('data-description', ev.description);
+            div.setAttribute('data-type', ev.type);
+            div.setAttribute('data-due-date', ev.dueDate);
+            div.setAttribute('data-due-time', ev.dueTime);
+            div.setAttribute('data-start-date', ev.startDate);
+            div.setAttribute('data-start-time', ev.startTime);
+            div.setAttribute('data-end-date', ev.endDate);
+            div.setAttribute('data-end-time', ev.endTime);
+            div.setAttribute('data-completion-date', ev.completionDate);
+
             var square = createElement('div', 'event-category ' + ev.color);
             var span = createElement('span', '', ev.eventName);
+
+            div.addEventListener('click', event => {
+                const taskDetails = event.currentTarget.dataset;
+          
+                const formatDate = (dateString) => {
+                    if (!dateString) return 'N/A';
+                    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                    const date = new Date(dateString);
+                    return date.toLocaleDateString(undefined, options);
+                };
+          
+                const formatTime = (timeString) => {
+                    if (!timeString) return 'N/A';
+                    const [hours, minutes] = timeString.split(':').map(Number);
+                    const date = new Date();
+                    date.setHours(hours, minutes);
+                    return date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', hour12: false });
+                };
+          
+                const taskType = taskDetails.type;
+          
+                document.getElementById('details-task').textContent = taskDetails.task;
+                document.getElementById('details-dedicated-to').textContent = taskDetails.dedicatedTo;
+                document.getElementById('details-description').textContent = taskDetails.description;
+          
+                if (taskType === 'event') {
+                    document.getElementById('details-due-date-time').style.display = 'block';
+                    document.getElementById('details-start-date-time').style.display = 'none';
+                    document.getElementById('details-end-date-time').style.display = 'none';
+                    document.getElementById('details-due-date').textContent = formatDate(taskDetails.dueDate);
+                    document.getElementById('details-due-time').textContent = formatTime(taskDetails.dueTime);
+                } else if (taskType === 'task') {
+                    document.getElementById('details-due-date-time').style.display = 'none';
+                    document.getElementById('details-start-date-time').style.display = 'block';
+                    document.getElementById('details-end-date-time').style.display = 'block';
+                    document.getElementById('details-start-date').textContent = formatDate(taskDetails.startDate);
+                    document.getElementById('details-start-time').textContent = formatTime(taskDetails.startTime);
+                    document.getElementById('details-end-date').textContent = formatDate(taskDetails.endDate);
+                    document.getElementById('details-end-time').textContent = formatTime(taskDetails.endTime);
+                }
+          
+                openModal();
+            });
 
             div.appendChild(square);
             div.appendChild(span);
@@ -272,3 +340,4 @@ document.addEventListener('DOMContentLoaded', function() {
     var events = JSON.parse('{{ events | tojson | safe }}');
     var calendar = new Calendar('#calendar', events);
 });
+
