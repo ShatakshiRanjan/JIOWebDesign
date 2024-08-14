@@ -40,12 +40,13 @@
     mysql -u root -p < Schema.sql
     ```
 
-7. **Update the MySQL connection details in `main.py`:**
+7. **Update the MySQL connection details in `config.py`:**
     ```python
-    app.config['MYSQL_HOST'] = '127.0.0.1'
-    app.config['MYSQL_USER'] = 'root'
-    app.config['MYSQL_PASSWORD'] = 'your_mysql_password'
-    app.config['MYSQL_DB'] = 'Taskify'
+    # Enter your database connection details below
+    MYSQL_HOST = '127.0.0.1'
+    MYSQL_USER = 'root'
+    MYSQL_PASSWORD = 'root'
+    MYSQL_DB = 'Taskify'
     ```
 
 8. **Run the Flask application:**
